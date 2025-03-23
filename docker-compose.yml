@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: personal-postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - personal-network
+  redis:
+    image: redis
+    container_name: personal-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis:/data
+    networks:
+      - personal-network
+
+  serverless-redis-http:
+    image: hiett/serverless-redis-http:latest
+    container_name: personal-redis-http
+    ports:
+      - '8079:80'
+    environment:
+      - SRH_MODE=${SRH_MODE}
+      - SRH_TOKEN=${SRH_TOKEN}
+      - SRH_CONNECTION_STRING=${SRH_CONNECTION_STRING}
+    networks:
+      - personal-network
+
+volumes:
+  db:
+  redis:
+
+networks:
+  personal-network:
+    driver: bridge

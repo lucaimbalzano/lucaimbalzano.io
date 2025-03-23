@@ -1,0 +1,104 @@
+{
+  "private": true,
+  "name": "lucaimbalzano.io",
+  "author": "lucaimbalzano <lucaimbalzanogmail.com> (https://github.com/lucaimbalzano/)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucaimbalzano/lucaimbalzano.io.git"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "turbo build",
+    "build:apps": "turbo build --filter=./apps/*",
+    "build:mdx": "turbo build:mdx",
+    "build:packages": "turbo build --filter=./packages/*",
+    "check": "turbo lint && turbo type-check && pnpm format:check && pnpm check:spelling && pnpm check:knip",
+    "check:knip": "dotenv -e .env.local -- knip",
+    "check:spelling": "cspell -c .cspell.json --no-progress --no-summary --no-must-find-files --unique",
+    "clean": "turbo clean && rm -rf .turbo coverage",
+    "commit": "cz",
+    "db:check": "turbo db:check",
+    "db:generate": "turbo db:generate",
+    "db:migrate": "turbo db:migrate",
+    "db:push": "turbo db:push",
+    "db:seed": "turbo db:seed",
+    "db:studio": "turbo db:studio",
+    "dev": "turbo dev",
+    "dev:docs": "turbo dev --filter=@simbashrd/docs",
+    "dev:packages": "turbo dev --filter=./packages/*",
+    "dev:web": "turbo dev --filter=@simbashrd/web",
+    "format:check": "prettier --cache --check --ignore-path .gitignore --ignore-path .prettierignore .",
+    "format:write": "prettier --cache --write --list-different --ignore-path .gitignore --ignore-path .prettierignore .",
+    "preinstall": "npx --yes only-allow pnpm",
+    "lint": "turbo lint && eslint . --max-warnings 0",
+    "lint:fix": "turbo lint:fix && eslint --fix .",
+    "prepare": "simple-git-hooks && pnpm build:packages",
+    "release": "changeset publish",
+    "test:e2e": "turbo test:e2e",
+    "test:e2e:inspector": "turbo test:e2e:inspector",
+    "test:e2e:install": "playwright install",
+    "test:e2e:ui": "turbo test:e2e:ui",
+    "test:unit": "vitest run",
+    "test:unit:coverage": "vitest --coverage --ui",
+    "test:unit:ui": "vitest --ui",
+    "type-check": "turbo type-check",
+    "version": "changeset version"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-git"
+    }
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.0.4",
+    "@react-three/fiber": "^9.1.0",
+    "@splinetool/react-spline": "^4.0.0",
+    "@splinetool/runtime": "^1.9.79"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.12",
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@playwright/test": "^1.50.0",
+    "@simbashrd/eslint-config": "workspace:*",
+    "@simbashrd/prettier-config": "workspace:*",
+    "@simbashrd/tsconfig": "workspace:*",
+    "@turbo/gen": "^2.3.4",
+    "@types/node": "^22.10.10",
+    "@vitest/coverage-v8": "^3.0.4",
+    "@vitest/ui": "^3.0.4",
+    "commitizen": "^4.3.1",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "cspell": "^8.17.2",
+    "cz-git": "^1.11.0",
+    "dotenv-cli": "^8.0.0",
+    "eslint": "^9.19.0",
+    "jsdom": "^26.0.0",
+    "knip": "^5.43.5",
+    "lint-staged": "^15.4.3",
+    "prettier": "^3.4.2",
+    "simple-git-hooks": "^2.11.1",
+    "ts-morph": "^25.0.0",
+    "tsup": "8.3.0",
+    "tsx": "^4.19.2",
+    "turbo": "^2.4.0",
+    "typescript": "5.7.3",
+    "vitest": "^3.0.4"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "lint-staged": {
+    "*.{cjs,mjs,js,jsx,cts,mts,ts,tsx,json}": "eslint --fix",
+    "**/*": [
+      "prettier --write --ignore-unknown",
+      "pnpm check:spelling"
+    ]
+  },
+  "packageManager": "pnpm@9.15.4",
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged",
+    "commit-msg": "pnpm commitlint --edit $1 && pnpm check:spelling $1"
+  }
+}

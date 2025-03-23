@@ -1,0 +1,46 @@
+{
+  "name": "@simbashrd/prettier-plugin-package-json",
+  "version": "0.0.3",
+  "description": "A prettier plugin using prettier-package-json",
+  "license": "MIT",
+  "author": "simbashrd <lucaimbalzano@gmail.com> (https://github.com/lucaimbalzano/)",
+  "homepage": "https://github.com/lucaimbalzano/lucaimbalzano.io#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucaimbalzano/lucaimbalzano.io.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lucaimbalzano/lucaimbalzano.io/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf .turbo dist",
+    "dev": "tsup --watch",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint --fix .",
+    "type-check": "tsc --noEmit"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "prettier-package-json": "^2.8.0"
+  },
+  "peerDependencies": {
+    "prettier": "3.x"
+  },
+  "devDependencies": {
+    "@simbashrd/eslint-config": "workspace:*",
+    "@simbashrd/tsconfig": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "lint-staged": {
+    "*.{cjs,mjs,js,jsx,cts,mts,ts,tsx,json}": "eslint --fix"
+  }
+}

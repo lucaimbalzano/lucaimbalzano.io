@@ -1,0 +1,29 @@
+---
+title: Avatar
+description: An image element with a fallback for representing the user.
+link:
+  doc: https://www.radix-ui.com/primitives/docs/components/avatar
+  api: https://www.radix-ui.com/primitives/docs/components/avatar#api-reference
+---
+
+<ComponentPreview name='avatar/avatar' />
+
+<Callout title='Note'>
+  You can use `getAvatarAbbreviation{:.entity.name.function}` to get the abbreviation of a name to be used in an `<AvatarFallback />{:tsx}`.
+</Callout>
+
+## Usage
+
+```tsx
+import { Avatar, AvatarFallback, AvatarImage } from '@simbashrd/ui'
+```
+
+```tsx
+<Avatar>
+  <AvatarImage
+    src='https://res.cloudinary.com/drizqfyp5/image/upload/v1739568695/jpg-01_eocpam.jpg'
+    alt='@lucaimbalzano'
+  />
+  <AvatarFallback>LI</AvatarFallback>
+</Avatar>
+```

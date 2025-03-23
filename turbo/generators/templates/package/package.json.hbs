@@ -1,0 +1,53 @@
+{
+  {{#unless shouldPublish}}
+  "private": true,
+  {{/unless}}
+  "name": "@simbashrd/{{ name }}",
+  "version": "{{ version }}",
+  "description": "{{{ description }}}",
+  "license": "MIT",
+  {{#if shouldPublish}}
+  "author": "simbashrd <lucaimbalzano@gmail.com> (https://github.com/simbashrd/)",
+  "homepage": "https://github.com/lucaimbalzano/lucaimbalzano.io#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucaimbalzano/lucaimbalzano.io.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lucaimbalzano/lucaimbalzano.io/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  {{/if}}
+  "type": "module",
+  {{#if shouldCompile}}
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  {{else}}
+  "main": "./src/index.ts",
+  {{/if}}
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint --fix .",
+    "type-check": "tsc --noEmit"
+    {{#if shouldCompile}}
+    ,"build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf .turbo dist"
+    {{else}}
+    ,"clean": "rm -rf .turbo"
+    {{/if}}
+  },
+  "devDependencies": {
+    "@simbashrd/eslint-config": "workspace:*",
+    "@simbashrd/tsconfig": "workspace:*"
+  },
+  "lint-staged": {
+    "*.{cjs,mjs,js,jsx,cts,mts,ts,tsx,json}": "eslint --fix"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
+  "access": "public",
+  "baseBranch": "main",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "fixed": [],
+  "ignore": [
+    "@simbashrd/mdx-plugins",
+    "@simbashrd/db",
+    "@simbashrd/docs",
+    "@simbashrd/env",
+    "@simbashrd/i18n",
+    "@simbashrd/kv",
+    "@simbashrd/shared",
+    "@simbashrd/web"
+  ],
+  "linked": [],
+  "updateInternalDependencies": "patch"
+}
