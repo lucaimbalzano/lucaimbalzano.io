@@ -42,3 +42,9 @@ coverage/
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+.vercel
+
+
+*io.pub
+*.io.pub
+*ssh_key_*.io*
