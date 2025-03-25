@@ -65,8 +65,8 @@ const Hero = () => {
   return (
     <div className='my-16 space-y-6'>
       <div className='flex flex-col justify-between gap-8 md:flex-row md:items-center'>
-        <div className='flex flex-col gap-4'>
-          <h1 className='flex flex-col flex-wrap gap-2 text-4xl font-bold sm:text-3xl'>
+        <div className='flex flex-col gap-4 text-2xl font-bold sm:text-3xl'>
+          <h1 className='flex flex-col flex-wrap gap-2 text-2xl font-bold sm:text-3xl'>
             <motion.div
               initial={{ x: 20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
