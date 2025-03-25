@@ -149,8 +149,8 @@ const Hero = () => {
         <div className='relative h-96 w-96'>
           <Spline
             scene='https://prod.spline.design/eK88pRzI7VUHDuIt/scene.splinecode'
-            className='h-full w-full scale-150'
-            style={{ maxWidth: '100%', maxHeight: '100%' }}
+            className={`h-full w-full scale-150`}
+            style={{ maxWidth: '80%', maxHeight: '100%' }}
           />
         </div>
       </div>
