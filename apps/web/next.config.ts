@@ -8,7 +8,7 @@ import { NextConfigHeaders } from '@simbashrd/shared'
 import createNextIntlPlugin from 'next-intl/plugin'
 import ReactComponentName from 'react-scan/react-component-name/webpack'
 
-const withNextIntl = createNextIntlPlugin()
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true'
@@ -24,9 +24,6 @@ const config: NextConfig = {
     buildActivity: process.env.NODE_ENV !== 'test'
   },
 
-  eslint: {
-    ignoreDuringBuilds: !!process.env.CI
-  },
   typescript: {
     ignoreBuildErrors: !!process.env.CI
   },

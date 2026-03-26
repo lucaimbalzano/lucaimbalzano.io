@@ -5,8 +5,6 @@ import { BlurImage } from '@simbashrd/ui'
 import { motion, useAnimate, useInView } from 'motion/react'
 import { useEffect, useRef } from 'react'
 
-import me from '~/images/me.png'
-
 const variants = {
   initial: {
     y: 40,
@@ -28,18 +26,18 @@ const GetInTouch = () => {
     animate(
       [
         ['#pointer', { left: 200, top: 60 }, { duration: 0 }],
-        ['#javascript', { opacity: 1 }, { duration: 0.3 }],
+        ['#god', { opacity: 1 }, { duration: 0.3 }],
         ['#pointer', { left: 50, top: 102 }, { at: '+0.5', duration: 0.5, ease: 'easeInOut' }],
-        ['#javascript', { opacity: 0.4 }, { at: '-0.3', duration: 0.1 }],
-        ['#react-js', { opacity: 1 }, { duration: 0.3 }],
+        ['#god', { opacity: 0.4 }, { at: '-0.3', duration: 0.1 }],
+        ['#math', { opacity: 1 }, { duration: 0.3 }],
         ['#pointer', { left: 224, top: 170 }, { at: '+0.5', duration: 0.5, ease: 'easeInOut' }],
-        ['#react-js', { opacity: 0.4 }, { at: '-0.3', duration: 0.1 }],
+        ['#math', { opacity: 0.4 }, { at: '-0.3', duration: 0.1 }],
         ['#typescript', { opacity: 1 }, { duration: 0.3 }],
         ['#pointer', { left: 88, top: 198 }, { at: '+0.5', duration: 0.5, ease: 'easeInOut' }],
         ['#typescript', { opacity: 0.4 }, { at: '-0.3', duration: 0.1 }],
-        ['#next-js', { opacity: 1 }, { duration: 0.3 }],
+        ['#dreaming', { opacity: 1 }, { duration: 0.3 }],
         ['#pointer', { left: 200, top: 60 }, { at: '+0.5', duration: 0.5, ease: 'easeInOut' }],
-        ['#next-js', { opacity: 0.4 }, { at: '-0.3', duration: 0.1 }]
+        ['#dreaming', { opacity: 0.4 }, { at: '-0.3', duration: 0.1 }]
       ],
       {
         repeat: Number.POSITIVE_INFINITY
@@ -62,23 +60,24 @@ const GetInTouch = () => {
         <div className='flex gap-12 max-md:flex-col'>
           <div className='relative size-64 max-md:mx-auto' ref={scope}>
             <BlurImage
-              src={me}
-              width={3975}
-              height={3975}
+              src='/gif/abstract.gif'
+              width={475}
+              height={475}
+              unoptimized
               className='absolute left-1/2 top-1/2 size-20 -translate-x-1/2 -translate-y-1/2 rounded-[20px]'
               alt={t('homepage.get-in-touch.image-alt')}
             />
             <div
-              id='next-js'
+              id='dreaming'
               className='bg-linear-to-b absolute bottom-12 left-14 rounded-3xl border from-zinc-50 to-zinc-100 px-2 py-1.5 text-xs opacity-40 dark:from-zinc-800 dark:to-zinc-900'
             >
-              Next.js
+              Dreaming
             </div>
             <div
-              id='react-js'
+              id='math'
               className='bg-linear-to-b absolute left-2 top-20 rounded-3xl border from-zinc-50 to-zinc-100 px-2 py-1.5 text-xs opacity-40 dark:from-zinc-800 dark:to-zinc-900'
             >
-              React.js
+              Math
             </div>
             <div
               id='typescript'
@@ -87,10 +86,10 @@ const GetInTouch = () => {
               TypeScript
             </div>
             <div
-              id='javascript'
+              id='god'
               className='bg-linear-to-b absolute right-8 top-10 rounded-3xl border from-zinc-50 to-zinc-100 px-2 py-1.5 text-xs opacity-40 dark:from-zinc-800 dark:to-zinc-900'
             >
-              JavaScript
+              God
             </div>
 
             <div id='pointer' className='absolute'>
