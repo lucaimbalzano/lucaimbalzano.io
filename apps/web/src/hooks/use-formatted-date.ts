@@ -1,20 +1,19 @@
 import { useFormatter } from '@simbashrd/i18n/client'
 import dayjs from 'dayjs'
 
+const DEFAULT_FORMAT_OPTIONS = {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric'
+} as const
+
 type Options = {
   relative?: boolean
-  formatOptions?: Parameters<ReturnType<typeof useFormatter>['dateTime']>['1']
+  formatOptions?: typeof DEFAULT_FORMAT_OPTIONS
 }
 
 export const useFormattedDate = (date: Date | string, options: Options = {}) => {
-  const {
-    relative = false,
-    formatOptions = {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    }
-  } = options
+  const { relative = false, formatOptions = DEFAULT_FORMAT_OPTIONS } = options
 
   const format = useFormatter()
   const now = new Date()
@@ -27,7 +26,7 @@ export const useFormattedDate = (date: Date | string, options: Options = {}) => 
     return Math.abs(weeksDiff) > 1
       ? format.dateTime(convertedDate, formatOptions)
       : format.relativeTime(convertedDate, now)
-  } else {
-    return format.dateTime(convertedDate, formatOptions)
   }
+
+  return format.dateTime(convertedDate, formatOptions)
 }

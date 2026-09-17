@@ -19,10 +19,8 @@ const config: NextConfig = {
     optimizePackageImports: ['shiki']
   },
 
-  devIndicators: {
-    appIsrStatus: process.env.NODE_ENV !== 'test',
-    buildActivity: process.env.NODE_ENV !== 'test'
-  },
+  // Next.js 16 only supports `position` (or `false` to disable)
+  devIndicators: process.env.NODE_ENV === 'test' ? false : { position: 'bottom-right' },
 
   typescript: {
     ignoreBuildErrors: !!process.env.CI

@@ -9,7 +9,6 @@ type LayoutProps = {
   params: Promise<{
     locale: string
   }>
-  searchParams: Promise<Record<string, string | string[] | undefined>>
   children: React.ReactNode
 }
 
@@ -18,7 +17,7 @@ const Layout = async (props: LayoutProps) => {
   const { locale } = await props.params
   const session = await getCurrentUser()
 
-  if (!session || session.role !== 'admin') {
+  if (session?.role !== 'admin') {
     redirect({
       href: '/',
       locale

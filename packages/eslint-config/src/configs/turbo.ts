@@ -6,10 +6,10 @@ export const turbo: Linter.Config[] = [
   {
     name: 'simbashrd:turbo',
     plugins: {
-      turbo: turboPlugin
+      turbo: turboPlugin as unknown as Record<string, unknown>
     },
     rules: {
-      ...turboPlugin.configs.recommended.rules
+      'turbo/no-undeclared-env-vars': 'error'
     }
   }
 ]
