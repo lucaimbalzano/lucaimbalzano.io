@@ -5,7 +5,7 @@ import type { Project } from 'content-collections'
 import { useTranslations } from '@simbashrd/i18n/client'
 import { buttonVariants } from '@simbashrd/ui'
 import { cn } from '@simbashrd/utils'
-import { ArrowUpRightIcon } from 'lucide-react'
+import { ArrowUpRightIcon, CircleIcon } from 'lucide-react'
 import { motion } from 'motion/react'
 
 import Link from '@/components/link'
@@ -25,7 +25,7 @@ const animation = {
 type HeaderProps = Project
 
 const Header = (props: HeaderProps) => {
-  const { name, description, homepage, github } = props
+  const { name, description, homepage, homepageActive, github } = props
   const t = useTranslations()
 
   const repo = github.split('/').pop()
@@ -48,11 +48,23 @@ const Header = (props: HeaderProps) => {
         animate={animation.show}
         transition={{ delay: 0.1 }}
       >
-        {homepage ? (
+        {homepage && homepageActive ? (
           <Link href={homepage} className={cn(buttonVariants(), 'group')}>
             {t('projects.visit-website')}
             <ArrowUpRightIcon className='ml-2 size-5 transition-transform group-hover:-rotate-12' />
           </Link>
+        ) : null}
+        {homepage && !homepageActive ? (
+          <span
+            className={cn(
+              buttonVariants({ variant: 'secondary' }),
+              'pointer-events-none cursor-default opacity-80'
+            )}
+            aria-disabled='true'
+          >
+            <CircleIcon className='mr-2 size-3 fill-red-500 text-red-500' aria-hidden />
+            {t('projects.unactive')}
+          </span>
         ) : null}
         <Link href={github} className={cn(buttonVariants(), 'group')}>
           {GITHUB_USERNAME}/{repo}

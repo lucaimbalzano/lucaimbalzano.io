@@ -2,19 +2,31 @@
 
 import {
   ChurchIcon,
+  Code2Icon,
+  DatabaseIcon,
+  GitBranchIcon,
   HomeIcon,
   LanguagesIcon,
+  LayersIcon,
   type LucideIcon,
   MapPinnedIcon,
+  NetworkIcon,
+  SearchIcon,
   ShieldCheckIcon,
   UsersIcon
 } from 'lucide-react'
 
 const iconMap = {
   Church: ChurchIcon,
+  Code2: Code2Icon,
+  Database: DatabaseIcon,
+  GitBranch: GitBranchIcon,
   Home: HomeIcon,
   Languages: LanguagesIcon,
+  Layers: LayersIcon,
   MapPinned: MapPinnedIcon,
+  Network: NetworkIcon,
+  Search: SearchIcon,
   ShieldCheck: ShieldCheckIcon,
   Users: UsersIcon
 } as const satisfies Record<string, LucideIcon>

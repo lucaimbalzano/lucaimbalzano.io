@@ -2,6 +2,7 @@ import type { Metadata, ResolvingMetadata } from 'next'
 import type { Article, WithContext } from 'schema-dts'
 
 import { flags } from '@simbashrd/env'
+// eslint-disable-next-line sonarjs/deprecation -- pending next-intl root-params migration
 import { setRequestLocale } from '@simbashrd/i18n/server'
 import { allPosts } from 'content-collections'
 import { notFound } from 'next/navigation'
@@ -9,16 +10,16 @@ import { Suspense } from 'react'
 
 import Comments from '@/components/comments'
 import Mdx from '@/components/mdx'
+import MobileTableOfContents from '@/components/mobile-table-of-contents'
+import TableOfContents from '@/components/table-of-contents'
 import { SITE_NAME, SITE_URL } from '@/lib/constants'
 import { getLocalizedPath } from '@/utils/get-localized-path'
 
 import Footer from './footer'
 import Header from './header'
 import LikeButton from './like-button'
-import MobileTableOfContents from './mobile-table-of-contents'
 import ProgressBar from './progress-bar'
 import Providers from './providers'
-import TableOfContents from './table-of-contents'
 
 type PageProps = {
   params: Promise<{
@@ -96,6 +97,8 @@ export const generateMetadata = async (
 
 const Page = async (props: PageProps) => {
   const { slug, locale } = await props.params
+  // next-intl still requires this in App Router layouts/pages until root-params migration
+  // eslint-disable-next-line @typescript-eslint/no-deprecated, sonarjs/deprecation -- pending next-intl root-params migration
   setRequestLocale(locale)
 
   const post = allPosts.find((p) => p.slug === slug && p.locale === locale)

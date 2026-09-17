@@ -1,12 +1,15 @@
 import type { Metadata, ResolvingMetadata } from 'next'
 import type { SoftwareApplication, WithContext } from 'schema-dts'
 
+// eslint-disable-next-line sonarjs/deprecation -- pending next-intl root-params migration
 import { setRequestLocale } from '@simbashrd/i18n/server'
 import { BlurImage } from '@simbashrd/ui'
 import { allProjects } from 'content-collections'
 import { notFound } from 'next/navigation'
 
 import Mdx from '@/components/mdx'
+import MobileTableOfContents from '@/components/mobile-table-of-contents'
+import TableOfContents from '@/components/table-of-contents'
 import { SITE_NAME, SITE_URL } from '@/lib/constants'
 import { getLocalizedPath } from '@/utils/get-localized-path'
 
@@ -83,6 +86,8 @@ export const generateMetadata = async (
 
 const Page = async (props: PageProps) => {
   const { slug, locale } = await props.params
+  // next-intl still requires this in App Router layouts/pages until root-params migration
+  // eslint-disable-next-line @typescript-eslint/no-deprecated, sonarjs/deprecation -- pending next-intl root-params migration
   setRequestLocale(locale)
 
   const project = allProjects.find((p) => p.slug === slug && p.locale === locale)
@@ -93,7 +98,7 @@ const Page = async (props: PageProps) => {
     notFound()
   }
 
-  const { name, code, description, github } = project
+  const { name, code, description, github, toc } = project
 
   const jsonLd: WithContext<SoftwareApplication> = {
     '@context': 'https://schema.org',
@@ -117,18 +122,26 @@ const Page = async (props: PageProps) => {
         type='application/ld+json'
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className='mx-auto max-w-3xl'>
-        <Header {...project} />
-        <BlurImage
-          src={`/images/projects/${slug}/cover.png`}
-          width={1280}
-          height={832}
-          alt={name}
-          className='my-12 rounded-lg'
-          lazy={false}
-        />
-        <Mdx code={code} />
+      <Header {...project} />
+      <BlurImage
+        src={`/images/projects/${slug}/cover.png`}
+        width={1280}
+        height={832}
+        alt={name}
+        className='my-12 rounded-lg'
+        lazy={false}
+      />
+      <div className='mt-8 flex flex-col justify-between lg:flex-row'>
+        <article className='w-full lg:w-[670px]'>
+          <Mdx code={code} />
+        </article>
+        <aside className='lg:min-w-[270px] lg:max-w-[270px]'>
+          <div className='sticky top-24'>
+            {toc.length > 0 ? <TableOfContents toc={toc} /> : null}
+          </div>
+        </aside>
       </div>
+      {toc.length > 0 ? <MobileTableOfContents toc={toc} /> : null}
     </>
   )
 }

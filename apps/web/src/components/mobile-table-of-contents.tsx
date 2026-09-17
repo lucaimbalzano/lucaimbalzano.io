@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import Link from '@/components/link'
+import { DEFAULT_SECTION_ICON, SECTION_ICONS } from '@/components/toc-icons'
 
 type MobileTableOfContentsProps = {
   toc: TOC[]
@@ -30,12 +31,14 @@ const MobileTableOfContents = (props: MobileTableOfContentsProps) => {
       <PopoverContent align='end' side='top' className='px-0 py-2'>
         {toc.map((item) => {
           const { title, url, depth } = item
+          const isMainSection = depth === 2
+          const Icon = isMainSection ? (SECTION_ICONS[url] ?? DEFAULT_SECTION_ICON) : null
 
           return (
             <Link
               key={url}
               href={`#${url}`}
-              className='text-muted-foreground hover:text-foreground block py-2.5 pr-2.5 text-sm leading-[1.2] transition-colors'
+              className='text-muted-foreground hover:text-foreground flex items-center gap-2 py-2.5 pr-2.5 text-sm leading-[1.2] transition-colors'
               style={{
                 paddingLeft: (depth - 1) * 16
               }}
@@ -44,6 +47,7 @@ const MobileTableOfContents = (props: MobileTableOfContentsProps) => {
                 setIsOpen(false)
               }}
             >
+              {Icon ? <Icon className='size-3.5 shrink-0' aria-hidden /> : null}
               {title}
             </Link>
           )

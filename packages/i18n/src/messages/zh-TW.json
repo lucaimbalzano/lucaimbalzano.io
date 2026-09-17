@@ -206,6 +206,7 @@
   "projects": {
     "description": "我的專案清單。所有東西都是用 ❤️ 製作",
     "title": "專案",
+    "unactive": "未上線",
     "visit-website": "前往網站"
   },
   "theme-toggle": {

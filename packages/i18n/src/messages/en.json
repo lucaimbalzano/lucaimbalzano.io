@@ -206,6 +206,7 @@
   "projects": {
     "description": "The list of my projects. Everything was made with ❤️.",
     "title": "Projects",
+    "unactive": "Unactive",
     "visit-website": "Visit Website"
   },
   "theme-toggle": {

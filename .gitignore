@@ -29,6 +29,7 @@ out/
 build/
 dist/
 .eslint-config-inspector/
+packages/eslint-config/eslint.config.bundled_*.mjs
 
 # Content Collections
 .content-collections

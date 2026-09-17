@@ -1,0 +1,357 @@
+---
+name: Nested Set Org Chart
+description: Full-stack org-chart explorer — Nested Set hierarchies in PostgreSQL, Django REST API, and a React force-graph UI.
+github: https://github.com/lucaimbalzano/nested-set-hierarchies-roles
+selected: true
+techstack:
+  - Django
+  - Django REST Framework
+  - PostgreSQL
+  - Nested Set Model
+  - React
+  - TypeScript
+  - Vite
+  - Tailwind CSS
+  - Docker
+---
+
+## Preface
+
+**Nested Set Org Chart** is a full-stack explorer for company hierarchies. Instead of adjacency lists or recursive CTEs for every query, the tree lives as a **Nested Set** in PostgreSQL: each node stores `level`, `iLeft`, and `iRight`, so an entire subtree is one range filter away.
+
+The stack is a Django REST API (JWT, Swagger) plus a React/Vite SPA with a folder tree, force-directed graph, and EN/IT labels for org units — departments like Marketing, Sales, and Helpdesk under a generic company root.
+
+<LinkCard
+  href='https://github.com/lucaimbalzano/nested-set-hierarchies-roles'
+  hostname='github.com'
+  title='nested-set-hierarchies-roles on GitHub'
+/>
+
+## The problem
+
+Org charts are trees. The usual options each have a cost:
+
+- **Adjacency list** (`parent_id`) — simple writes, painful deep reads (recursive queries)
+- **Materialized path** — string prefixes, awkward rebalancing
+- **Nested Set** — denser writes when inserting, but **O(1)-style subtree reads** with two integers
+
+This project leans into Nested Set end to end: seed a sample company tree, expose range queries over the API, then rebuild parent/child edges in the UI for graph and tree views — without a `parent_id` column.
+
+## Nested Set model
+
+Each node is a closed interval on a depth-first traversal:
+
+<Table
+  headers={['Field', 'Meaning']}
+  rows={[
+    ['level', 'Depth in the tree (root = 0)'],
+    ['iLeft / iRight', 'Contiguous visit bounds']
+  ]}
+/>
+
+Invariants used everywhere:
+
+- **Descendants of N** → `iLeft > N.iLeft AND iRight < N.iRight`
+- **Parent of N** → unique node with `level == N.level - 1` whose bounds enclose N
+- **Direct children** → same range filter **plus** `level == N.level + 1`
+
+Localized names live in a related table `(language, nodeName)` → node, so the same tree serves English and Italian labels.
+
+## Product preview
+
+Tree browser on one side, force-directed org graph on the other — both driven by the same Nested Set payload.
+
+<Image
+  src='/images/projects/nested-set-org-chart/preview.png'
+  width={1280}
+  height={592}
+  alt='Org chart UI — nested tree browser and force-directed graph'
+/>
+
+## Folder structure
+
+Monorepo-style layout: Django API at the root, React SPA in `org-view-flow/`, Docker for Postgres + services.
+
+<TreeView
+  defaultExpandedValue={['api', 'api/models', 'api/views', 'org-view-flow', 'org-view-flow/src', 'docker']}
+  collection={{
+    id: 'ROOT',
+    name: '',
+    children: [
+      {
+        id: 'api',
+        name: 'api',
+        children: [
+          {
+            id: 'api/models',
+            name: 'models',
+            children: [
+              { id: 'api/models/node_tree', name: 'node_tree.py' },
+              { id: 'api/models/node_tree_names', name: 'node_tree_names.py' }
+            ]
+          },
+          {
+            id: 'api/views',
+            name: 'views',
+            children: [
+              { id: 'api/views/node_views', name: 'node_views.py' },
+              { id: 'api/views/auth_views', name: 'auth_views.py' }
+            ]
+          },
+          { id: 'api/serializers', name: 'serializers/' },
+          { id: 'api/utils', name: 'utils/' },
+          { id: 'api/tests', name: 'tests/' },
+          { id: 'api/database', name: 'database/init_data.py' }
+        ]
+      },
+      {
+        id: 'org-view-flow',
+        name: 'org-view-flow',
+        children: [
+          {
+            id: 'org-view-flow/src',
+            name: 'src',
+            children: [
+              { id: 'org-view-flow/src/api', name: 'api/nodeService.ts' },
+              { id: 'org-view-flow/src/components', name: 'components/OrgGraph.tsx' },
+              { id: 'org-view-flow/src/store', name: 'store/' },
+              { id: 'org-view-flow/src/pages', name: 'pages/' }
+            ]
+          },
+          { id: 'org-view-flow/public', name: 'public/' }
+        ]
+      },
+      { id: 'common', name: 'common/' },
+      { id: 'nested_set_hierarchies_roles', name: 'nested_set_hierarchies_roles/' },
+      {
+        id: 'docker',
+        name: 'docker',
+        children: [
+          { id: 'docker/compose', name: 'compose files' },
+          { id: 'docker/Dockerfiles', name: 'Dockerfiles' }
+        ]
+      },
+      { id: 'Makefile', name: 'Makefile' },
+      { id: 'pyproject', name: 'pyproject.toml' }
+    ]
+  }}
+/>
+
+## Architecture
+
+```text
+┌──────────────────────┐         ┌─────────────────────────────┐
+│  org-view-flow       │   API   │  Django · DRF · SimpleJWT   │
+│  React · Vite · TS   │ ──────► │  Nested Set · PostgreSQL    │
+│  TanStack Query      │         │  Swagger (drf-spectacular)  │
+│  Zustand · i18next   │         │  Cors · Docker Compose      │
+│  Canvas force graph  │         │                             │
+└──────────────────────┘         └─────────────────────────────┘
+```
+
+### Backend
+
+- Django 5 + DRF list/detail/search endpoints under `/api/nodes/`
+- JWT signup/login; docs at `/api/docs/`
+- Nested Set seed data for a sample company hierarchy
+- Custom 0-based pagination (`page_num` / `page_size`)
+
+### Frontend
+
+- React 18 + Vite + Tailwind + shadcn/ui
+- Folder tree + custom canvas force layout (concentric levels)
+- Client-side parent recovery from `(level, iLeft, iRight)`
+- EN/IT via react-i18next
+
+## Under the hood
+
+Three of the geekier bits — range queries, parent reconstruction, and a Nested Set–aware force layout. Code blocks use the same titled `CodeBlock` UI as the rest of the site.
+
+### Subtree count & search with two inequalities
+
+Classic Nested Set: no recursion. Descendants of a node are everything strictly inside its `[iLeft, iRight]` interval; keyword search reuses the same bounds.
+
+```python title='api/views/node_views.py'
+# Single node: count ALL descendants via nested-set bounds
+result = {
+    "node_id": node.id,
+    "name": name_obj.nodeName,
+    "children_count": NodeTree.objects.filter(
+        iLeft__gt=node.iLeft, iRight__lt=node.iRight
+    ).count(),
+}
+
+# Search: keyword match anywhere under parent's [iLeft, iRight] interval
+children = NodeTree.objects.filter(
+    iLeft__gt=parent_node.iLeft,
+    iRight__lt=parent_node.iRight,
+    names__nodeName__icontains=keyword,
+    names__language=language,
+).distinct()
+
+parent_matches = NodeTree.objects.filter(
+    id=parent_node.id,
+    names__nodeName__icontains=keyword,
+    names__language=language,
+).distinct()
+
+return (children | parent_matches).order_by("id")
+```
+
+### Rebuild parents without a parent_id column
+
+The API returns flat Nested Set rows. The SPA recovers the tree graph with the enclosure rule: parent is the unique node one level up whose interval contains the child.
+
+```ts title='org-view-flow/src/api/nodeService.ts'
+export const getParentId = (nodes: NodeTree[], node: NodeTree): number | null => {
+  const parent = nodes.find(
+    (parent) =>
+      parent.level === node.level - 1 &&
+      parent.iLeft < node.iLeft &&
+      parent.iRight > node.iRight
+  )
+  return parent?.id || null
+}
+
+export const getChildrenCount = (nodes: NodeTree[], node: NodeTree): number => {
+  return nodes.filter(
+    (child) =>
+      child.level === node.level + 1 &&
+      child.iLeft > node.iLeft &&
+      child.iRight < node.iRight
+  ).length
+}
+
+const processedNodes = nodes.map((node) => ({
+  ...node,
+  parentId: getParentId(results, results.find((n) => n.id === node.id)!),
+  childrenCount: getChildrenCount(results, results.find((n) => n.id === node.id)!)
+}))
+```
+
+### Force layout from Nested Set edges
+
+Nodes seed on concentric rings (`radius ≈ level`). Links come from the reconstructed `parentId`, then a light spring simulation keeps the org chart readable.
+
+```ts title='org-view-flow/src/components/OrgGraph.tsx'
+const nodes = allNodes.map((node) => {
+  const levelNodes = allNodes.filter((n) => n.level === node.level)
+  const levelIndex = levelNodes.findIndex((n) => n.id === node.id)
+  const angleStep = (2 * Math.PI) / levelNodes.length
+  const radius = node.level * 120 + 80
+
+  return {
+    id: node.id,
+    name: node.name,
+    level: node.level,
+    x: Math.cos(levelIndex * angleStep) * radius,
+    y: Math.sin(levelIndex * angleStep) * radius
+  }
+})
+
+// Links reconstructed from nested-set parentId
+const links = allNodes
+  .filter((node) => node.parentId !== null)
+  .map((node) => ({
+    source: nodes.find((n) => n.id === node.parentId) || node.parentId,
+    target: nodes.find((n) => n.id === node.id) || node.id
+  }))
+```
+
+## Features
+
+<FeatureGrid
+  items={[
+    {
+      icon: 'Layers',
+      title: 'Nested Set storage',
+      description: 'Subtree reads with iLeft/iRight range filters — no recursive CTEs on every request.'
+    },
+    {
+      icon: 'Network',
+      title: 'Force-directed org graph',
+      description: 'Concentric levels and spring edges inferred from Nested Set parent recovery.'
+    },
+    {
+      icon: 'GitBranch',
+      title: 'Tree + graph dual view',
+      description: 'Folder-style browser and canvas graph share the same API payload.'
+    },
+    {
+      icon: 'Search',
+      title: 'Subtree keyword search',
+      description: 'Search names inside a parent interval, with EN/IT language selection.'
+    },
+    {
+      icon: 'ShieldCheck',
+      title: 'JWT-gated API',
+      description: 'Signup/login with SimpleJWT and OpenAPI docs via drf-spectacular.'
+    },
+    {
+      icon: 'Database',
+      title: 'Dockerized Postgres',
+      description: 'Compose stack for API, DB, and frontend preview — one Makefile to bring it up.'
+    }
+  ]}
+/>
+
+## Tech stack
+
+<ItemGrid
+  items={[
+    {
+      image: '/images/projects/nested-set-org-chart/icons/django.png',
+      name: 'Django',
+      description: 'API framework',
+      url: 'https://www.djangoproject.com'
+    },
+    {
+      image: '/images/projects/nested-set-org-chart/icons/postgresql.png',
+      name: 'PostgreSQL',
+      description: 'Nested Set store',
+      url: 'https://www.postgresql.org'
+    },
+    {
+      image: '/images/projects/nested-set-org-chart/icons/react.png',
+      name: 'React',
+      description: 'SPA UI',
+      url: 'https://react.dev'
+    },
+    {
+      image: '/images/projects/nested-set-org-chart/icons/typescript.png',
+      name: 'TypeScript',
+      description: 'Typed frontend',
+      url: 'https://www.typescriptlang.org'
+    },
+    {
+      image: '/images/projects/nested-set-org-chart/icons/vite.png',
+      name: 'Vite',
+      description: 'Frontend tooling',
+      url: 'https://vitejs.dev'
+    },
+    {
+      image: '/images/projects/nested-set-org-chart/icons/tailwindcss.png',
+      name: 'Tailwind CSS',
+      description: 'Styling + shadcn/ui',
+      url: 'https://tailwindcss.com'
+    },
+    {
+      image: '/images/projects/nested-set-org-chart/icons/docker.png',
+      name: 'Docker',
+      description: 'Local stack',
+      url: 'https://www.docker.com'
+    }
+  ]}
+/>
+
+## Open source & links
+
+Source, Makefile targets (`make up`, `make test`, `make frontend`), and Swagger live in the repo.
+
+<LinkCard
+  href='https://github.com/lucaimbalzano/nested-set-hierarchies-roles'
+  hostname='github.com'
+  title='View on GitHub'
+/>
+
+If you care about **tree algebra in SQL** as much as pretty org charts, this is the project where Nested Set stops being a textbook footnote and becomes the API contract.
