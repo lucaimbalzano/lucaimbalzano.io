@@ -147,16 +147,10 @@
       "title": "有關 Next.js 的任何問題？"
     },
     "hero": {
-      "amazing": "可靠",
-      "attractive": "可擴展",
-      "fantastic": "強大",
-      "location-timezone": "羅馬，義大利 • UTC/GMT +1",
-      "stunning": "驚豔",
-      "title-bottom": "能夠產生真正的世界影響",
-      "title-middle-left": "建立",
-      "title-middle-right": "系統",
-      "title-top": "我是 Luca Imbalzano，",
-      "title-top-second": "一位軟體工程師"
+      "line-one-accent": "天空",
+      "line-one-prefix": "夢想來自",
+      "line-two-accent": "影響力",
+      "line-two-prefix": "專為"
     },
     "latest-articles": {
       "card": "文章",

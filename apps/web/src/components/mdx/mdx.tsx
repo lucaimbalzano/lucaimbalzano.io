@@ -7,9 +7,11 @@ import Link from '../link'
 import FeatureGrid from './feature-grid'
 import Heading from './heading'
 import Icon from './icon'
+import ImageCarousel from './image-carousel'
 import ItemGrid from './item-grid'
 import LinkCard from './link-card'
 import Logo from './logo'
+import ObsidianGraph from './obsidian-graph'
 import Table from './table'
 import TreeView from './tree-view'
 import Video from './video'
@@ -37,12 +39,13 @@ const components = {
     )
   },
   Image: (props: React.ComponentProps<typeof BlurImage>) => {
-    const { alt, ...rest } = props
+    const { alt, src, ...rest } = props
+    const zoomSrc = typeof src === 'string' ? src : undefined
 
     return (
       <>
-        <ImageZoom>
-          <BlurImage className='rounded-lg border' alt={alt} {...rest} />
+        <ImageZoom zoomImg={zoomSrc ? { src: zoomSrc, alt } : undefined}>
+          <BlurImage className='rounded-lg border' alt={alt} src={src} {...rest} />
         </ImageZoom>
         <figcaption className='mt-4 text-center'>{alt}</figcaption>
       </>
@@ -55,6 +58,8 @@ const components = {
   ItemGrid,
   FeatureGrid,
   Icon,
+  ImageCarousel,
+  ObsidianGraph,
   Video,
   LinkCard,
   Logo,

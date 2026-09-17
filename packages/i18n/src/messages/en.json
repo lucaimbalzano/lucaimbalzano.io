@@ -147,16 +147,10 @@
       "title": "Any question?"
     },
     "hero": {
-      "amazing": "Reliable",
-      "attractive": "Scalable",
-      "fantastic": "Robust",
-      "location-timezone": "Rome, Italy • UTC/GMT +1",
-      "stunning": "Stunning",
-      "title-bottom": " that make a real-world impact",
-      "title-middle-left": "building",
-      "title-middle-right": "systems",
-      "title-top": "I’m Luca Imbalzano,",
-      "title-top-second": "a Software Engineer"
+      "line-one-accent": "sky",
+      "line-one-prefix": "Dreams from the",
+      "line-two-accent": "impact",
+      "line-two-prefix": "Built for"
     },
     "latest-articles": {
       "card": "Article",

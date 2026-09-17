@@ -30,10 +30,9 @@ const SelectedProjects = () => {
   const isInView = useInView(projectsRef, { once: true, margin: '-100px' })
   const t = useTranslations()
   const locale = useLocale()
-  const filteredProjects = allProjects.filter(
-    (project) => project.selected && project.locale === locale
-  )
-  console.log('selected-projects::filteredProjects,', filteredProjects)
+  const filteredProjects = allProjects
+    .filter((project) => project.selected && project.locale === locale)
+    .sort((a, b) => (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER))
   return (
     <motion.div
       initial='initial'

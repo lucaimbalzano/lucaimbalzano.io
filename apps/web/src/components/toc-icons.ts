@@ -35,7 +35,13 @@ export const SECTION_ICONS: Record<string, LucideIcon> = {
   'hybrid-memory': LayersIcon,
   // kaggle-ml-learning
   results: TrendingUpIcon,
-  'the-learning-loop': SparklesIcon
+  'the-learning-loop': SparklesIcon,
+  // tranqui
+  'design-decisions': LayersIcon,
+  'documentation-graph': NetworkIcon,
+  'tenancy-and-access': ShieldCheckIcon,
+  'billing-that-survives-retries': WorkflowIcon,
+  'auth-at-the-edge': ShieldCheckIcon
 }
 
 export const DEFAULT_SECTION_ICON = LayersIcon

@@ -51,7 +51,9 @@ const projects = defineCollection({
     homepageActive: z.boolean().optional().default(true),
     github: z.string(),
     techstack: z.array(z.string()),
-    selected: z.boolean().optional().default(false)
+    selected: z.boolean().optional().default(false),
+    /** Lower = earlier on the homepage selected grid. Unset sorts last. */
+    order: z.number().optional()
   }),
   transform
 })

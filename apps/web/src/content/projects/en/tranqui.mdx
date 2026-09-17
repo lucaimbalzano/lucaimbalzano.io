@@ -1,0 +1,405 @@
+---
+name: Tranqui
+description: Multi-tenant Transport CRM — NestJS Clean Architecture, Next.js ops UI, Stripe-ready SaaS tenancy, and staging on EC2/ECR/Caddy.
+homepage: https://staging-app.tranqui.io
+homepageActive: true
+github: https://github.com/tranqui-org
+selected: true
+order: 1
+techstack:
+  - NestJS
+  - Next.js
+  - TypeScript
+  - PostgreSQL
+  - Sequelize
+  - Stripe
+  - AWS S3
+  - Docker
+  - Caddy
+---
+
+## Preface
+
+**Tranqui** is a multi-tenant **Transport CRM** I designed and built end to end — backend and frontend — for fleet operators who need one place to run vehicles, clients, rents (noleggi), teams, documents, and billing.
+
+The product is not a CRUD demo. It is a **SaaS-shaped system**: companies (tenants) with optional sub-companies, role-based access, team-scoped data, subscription lifecycle via Stripe, and a staging environment that mirrors how I would ship a real startup.
+
+I treated the role as **startup CTO**: decide the boundaries first, keep the domain honest, and make the boring reliability pieces (auth refresh, webhook idempotency, tenant isolation) non-negotiable.
+
+<LinkCard
+  href='https://staging-app.tranqui.io'
+  hostname='staging-app.tranqui.io'
+  title='Tranqui staging app'
+/>
+
+<LinkCard
+  href='https://github.com/tranqui-org'
+  hostname='github.com'
+  title='tranqui-org on GitHub'
+/>
+
+## The problem
+
+Transport operators already live in spreadsheets, WhatsApp threads, and a pile of single-purpose tools. What they need looks simple on a slide — “manage the fleet” — and gets hard in production:
+
+- **Many companies, one product** — isolation between tenants, plus parent companies that must see child companies
+- **People are not flat roles** — admins, supervisors, drivers, secretaries; permissions must change without forcing everyone to re-login
+- **Teams matter** — not every user should see every vehicle or rent
+- **Money fails loudly** — Stripe webhooks retry; you cannot double-apply an invoice event
+- **Ops UI must stay fast** — stale JWTs kill trust; refresh has to be invisible
+
+Tranqui is my answer to that shape: a **Clean Architecture API** and a **Next.js ops console**, wired for tenancy, RBAC, and billing from day one.
+
+## Product preview
+
+Ops console for modern transport businesses — rents on a vehicle timeline, fleet cards, and mobile surfaces for backoffice + drivers. Staging auth is the door in; the product is what happens after.
+
+<ImageCarousel
+  images={[
+    {
+      src: '/images/projects/tranqui/preview-1.png',
+      alt: 'Tranqui — Gestione Noleggi timeline across the fleet',
+      width: 3328,
+      height: 1872
+    },
+    {
+      src: '/images/projects/tranqui/preview-2.png',
+      alt: 'Tranqui product — Gestione Noleggi and Gestione Carte on mobile',
+      width: 3328,
+      height: 1872
+    },
+    {
+      src: '/images/projects/tranqui/preview.png',
+      alt: 'Tranqui staging sign-in — Accedi',
+      width: 2001,
+      height: 1116
+    }
+  ]}
+/>
+
+## Design decisions
+
+I did not optimize for “most frameworks.” I optimized for **clear ownership** and **safe defaults**.
+
+<FeatureGrid
+  items={[
+    {
+      icon: 'Layers',
+      title: 'Clean Architecture API',
+      description:
+        'Controllers stay thin. Use-cases own behavior. Repositories and an IDataServices unit-of-work sit behind abstractions — so Stripe, S3, and email are replaceable without rewriting domain rules.'
+    },
+    {
+      icon: 'ShieldCheck',
+      title: 'App-level multi-tenancy',
+      description:
+        'Every request carries tenant context. Guards verify membership, expand parent→child visibility, and keep queries scoped. Isolation is enforced in the application layer where the product rules live.'
+    },
+    {
+      icon: 'Users',
+      title: 'RBAC + team scope',
+      description:
+        'Permissions are resource/action pairs. The DB is authoritative so grants take effect immediately; JWT stays a cache. TeamScopeGuard narrows what drivers and secretaries can see.'
+    },
+    {
+      icon: 'Workflow',
+      title: 'Billing that survives retries',
+      description:
+        'Stripe webhooks hit a dedicated raw-body route. Events are persisted with find-or-create on stripe_event_id before any side effect — so retries are safe.'
+    },
+    {
+      icon: 'Database',
+      title: 'Documents & infra reality',
+      description:
+        'Entity documents go to S3 with presigned downloads. Email goes through Resend. Staging ships as ECR images on EC2 behind Caddy TLS — the same path I would use for a first production cut.'
+    },
+    {
+      icon: 'Code2',
+      title: 'Ops UI with honest boundaries',
+      description:
+        'Next.js App Router, feature folders, Zustand, RHF+Zod, next-intl. Middleware refreshes httpOnly cookies before protected routes. Invoices/payslips stay UI placeholders until the domain is ready — no fake backend.'
+    }
+  ]}
+/>
+
+## Architecture
+
+Two repositories, one system. The API owns invariants; the web app owns workflows and presentation.
+
+Diagram authored in [Eraser](https://app.eraser.io/workspace/uN7aUFVmQGvABZv69fTF?diagram=HZwWe9KXsSNjdD0_1YFU&layout=canvas) — browser → edge/staging → NestJS Clean Architecture → Postgres, with Stripe / S3 / Resend / Mapbox on the side.
+
+<Image
+  src='/images/projects/tranqui/architecture.png'
+  width={2180}
+  height={2120}
+  alt='Tranqui system architecture — clients, edge, NestJS layers, and external services'
+/>
+
+### Backend layout
+
+Controllers never hide business rules. Use-cases are the product language: auth, tenants, teams, vehicles, insurance, maintenances, clients, expenses, cards, rents, documents, violation notices, presences, dashboard, settings, Stripe.
+
+<TreeView
+  defaultExpandedValue={[]}
+  collection={{
+    id: 'ROOT',
+    name: '',
+    children: [
+      {
+        id: 'src',
+        name: 'src',
+        children: [
+          { id: 'src/main', name: 'main.ts' },
+          { id: 'src/app', name: 'app.module.ts' },
+          {
+            id: 'src/controllers',
+            name: 'controllers',
+            children: [{ id: 'src/controllers/star', name: '*.controller.ts' }]
+          },
+          {
+            id: 'src/use-cases',
+            name: 'use-cases',
+            children: [
+              { id: 'src/use-cases/auth', name: 'auth/' },
+              { id: 'src/use-cases/tenants', name: 'tenants/' },
+              { id: 'src/use-cases/teams', name: 'teams/' },
+              { id: 'src/use-cases/vehicles', name: 'vehicles/' },
+              { id: 'src/use-cases/rents', name: 'rents/' },
+              { id: 'src/use-cases/stripe', name: 'stripe/' }
+            ]
+          },
+          {
+            id: 'src/common',
+            name: 'common',
+            children: [
+              { id: 'src/common/guards', name: 'guards/' },
+              { id: 'src/common/decorators', name: 'decorators/' }
+            ]
+          },
+          {
+            id: 'src/services',
+            name: 'services',
+            children: [
+              { id: 'src/services/auth', name: 'auth/' },
+              { id: 'src/services/s3', name: 's3/' },
+              { id: 'src/services/stripe', name: 'stripe/' },
+              { id: 'src/services/email', name: 'email/' }
+            ]
+          },
+          {
+            id: 'src/database',
+            name: 'database',
+            children: [
+              { id: 'src/database/migrations', name: 'migrations/' },
+              { id: 'src/database/seeds', name: 'seeds/' }
+            ]
+          }
+        ]
+      }
+    ]
+  }}
+/>
+
+### Frontend layout
+
+Route groups for auth vs dashboard, Italian path aliases where the operators live (`veicoli`, `noleggi`, …), and feature modules that match the API language.
+
+<TreeView
+  defaultExpandedValue={[]}
+  collection={{
+    id: 'ROOT',
+    name: '',
+    children: [
+      {
+        id: 'src',
+        name: 'src',
+        children: [
+          { id: 'src/middleware', name: 'middleware.ts' },
+          {
+            id: 'src/app',
+            name: 'app',
+            children: [
+              { id: 'src/app/auth', name: '(auth)/' },
+              { id: 'src/app/dashboard', name: '(dashboard)/' },
+              { id: 'src/app/sync', name: 'api/auth/sync-tokens/' }
+            ]
+          },
+          {
+            id: 'src/features',
+            name: 'features',
+            children: [
+              { id: 'src/features/auth', name: 'auth/' },
+              { id: 'src/features/vehicles', name: 'vehicles/' },
+              { id: 'src/features/rents', name: 'rents/' },
+              { id: 'src/features/teams', name: 'teams/' },
+              { id: 'src/features/subscription', name: 'subscription/' }
+            ]
+          },
+          { id: 'src/lib', name: 'lib/api/services/' },
+          { id: 'src/stores', name: 'stores/' },
+          { id: 'src/i18n', name: 'i18n/' }
+        ]
+      }
+    ]
+  }}
+/>
+
+## Documentation graph
+
+Code trees show **where** things live. For Tranqui I also kept an **Obsidian vault** — a linked-note graph of **why** they live that way: tenancy rules, Stripe idempotency, auth refresh, use-case boundaries, and the decisions that should not evaporate into Slack.
+
+Obsidian fits this shape better than a static wiki: every note can `[[wikilink]]` the next, the graph view exposes orphans and dense clusters, and markdown stays diffable next to the repos.
+
+<ObsidianGraph />
+
+<TreeView
+  defaultExpandedValue={[]}
+  collection={{
+    id: 'ROOT',
+    name: '',
+    children: [
+      {
+        id: 'vault',
+        name: 'tranqui-docs (Obsidian)',
+        children: [
+          { id: 'vault/home', name: 'Home.md' },
+          { id: 'vault/architecture', name: 'Architecture.md' },
+          {
+            id: 'vault/domain',
+            name: 'Domain',
+            children: [
+              { id: 'vault/domain/tenants', name: 'Tenants.md' },
+              { id: 'vault/domain/teams', name: 'Teams.md' },
+              { id: 'vault/domain/vehicles', name: 'Vehicles.md' },
+              { id: 'vault/domain/rents', name: 'Rents.md' },
+              { id: 'vault/domain/billing', name: 'Billing.md' }
+            ]
+          },
+          {
+            id: 'vault/flows',
+            name: 'Flows',
+            children: [
+              { id: 'vault/flows/auth', name: 'Auth refresh.md' },
+              { id: 'vault/flows/stripe', name: 'Stripe webhooks.md' },
+              { id: 'vault/flows/permissions', name: 'RBAC + TeamScope.md' }
+            ]
+          },
+          {
+            id: 'vault/decisions',
+            name: 'Decisions',
+            children: [
+              { id: 'vault/decisions/clean', name: 'Clean Architecture.md' },
+              { id: 'vault/decisions/tenancy', name: 'App-level tenancy.md' },
+              { id: 'vault/decisions/docs', name: 'Why Obsidian.md' }
+            ]
+          }
+        ]
+      }
+    ]
+  }}
+/>
+
+**Why auto-doc with Obsidian is attractive here.** A Transport CRM accumulates product language faster than READMEs keep up. Generating or syncing notes from use-case folders, Swagger, and ADR stubs into an Obsidian vault would keep the graph close to the code: new modules get a seed note, `[[links]]` surface coupling, and onboarding becomes “open the graph” instead of “ask whoever remembers.” Human editing stays for judgment; automation stays for structure and freshness.
+
+## Tenancy and access
+
+Multi-tenancy is a product decision, not a database checkbox. I chose **application-level isolation**: `tenant_id` on rows, tenant IDs on the request, and a guard pipeline that fails closed.
+
+**Why not lean on RLS alone?** Product rules here are richer than “same tenant id” — parent companies expand into sub-companies, supervisors see all teams, drivers do not. Those rules belong next to the use-cases, where they stay testable and explicit.
+
+The access path is layered on purpose:
+
+1. **JWT** — who is calling
+2. **Tenant verification** — are they allowed in this company (with a subscription-lenient variant where onboarding needs it)
+3. **Expand sub-companies** — parent visibility without duplicating data models
+4. **`@RequirePermission` + PermissionGuard** — resource/action checks; **DB permissions win**, JWT is fallback for unseeded tenants
+5. **TeamScopeGuard** — `teamIds` for membership-scoped reads; admins/supervisors keep a wide lens
+
+```ts
+// PermissionGuard — DB is source of truth; JWT is cache
+const dbPerm = await this.tenantRolePermissions.resolvePermission(
+  Number(tu.tenantId),
+  null,
+  Number(tu.roleId),
+  resource,
+)
+
+if (dbPerm) {
+  // DB record exists — authoritative. No JWT fallback.
+  if (allowed) return true
+  continue
+}
+
+// No DB record yet → fall back to JWT cache
+if (hasPermissionFromJwt(tu, resource, action)) return true
+```
+
+That single choice — **permissions effective immediately without re-login** — is the kind of detail that separates a polished CRM from a brittle admin panel.
+
+## Auth at the edge
+
+Tokens are short-lived for a reason. The frontend stores **access + refresh in httpOnly cookies** (≈15m / 7d), syncs them through a small Next route, and lets **middleware** refresh before protected pages.
+
+When access is missing or expired, middleware rotates with the refresh token and **redirects to the same URL** so Server Components never see a half-updated cookie jar. Stateless refresh with rotation keeps stolen access tokens boring and refresh theft detectable.
+
+## Billing that survives retries
+
+Stripe will call you more than once. I designed the webhook path around that fact:
+
+- Dedicated raw-body route for signature verification
+- Persist the event with **`createIfNotExists` / `findOrCreate` on `stripe_event_id`**
+- If the row already exists → **return**; never re-run side effects
+- Tenant resolved from `metadata.tenant_id`
+- Dunning / subscription mail through Resend when payment fails or resumes
+
+```ts
+const { created } = await this.dataServices.stripeEvents.createIfNotExists({
+  stripe_event_id: event.id,
+  type: event.type,
+  payload: event as unknown as Record<string, unknown>,
+  processed_at: new Date(),
+})
+if (!created) {
+  return
+}
+```
+
+Checkout and customer portal sit in the same Stripe use-case family as the webhook — one billing vocabulary across API and UI.
+
+## Under the hood
+
+A few more choices that shaped the system:
+
+<Table
+  headers={['Decision', 'What I chose', 'Why']}
+  rows={[
+    ['API shape', 'Use-cases over fat controllers', 'Domain language stays readable as the CRM grows'],
+    ['Tenancy', 'App-level guards + tenant filters', 'Parent/child and team rules are product logic'],
+    ['Permissions', 'DB-first RBAC', 'Admins can change access without forcing re-auth'],
+    ['Auth UX', 'httpOnly cookies + edge refresh', 'XSS-resistant tokens; no silent 401 loops'],
+    ['Files', 'S3 + presigned downloads', 'Documents stay off the API disk'],
+    ['Maps / address', 'Nominatim then Mapbox fallback', 'Good defaults, paid accuracy when needed'],
+    ['Staging', 'GHA → ECR → EC2 + Caddy', 'Real TLS and compose path before production'],
+    ['Docs', 'Obsidian knowledge graph', 'Wikilinks + graph view keep domain decisions discoverable'],
+    ['UI honesty', 'Mock invoices/payslips only', 'No pretend ledgers until the domain is ready']
+  ]}
+/>
+
+## Tech stack
+
+| Layer | Choices |
+| --- | --- |
+| API | NestJS 11, Sequelize, PostgreSQL, Passport JWT, Swagger, Schedule |
+| Web | Next.js 14 App Router, React 18, Tailwind, Radix/shadcn, Zustand, RHF + Zod, next-intl |
+| Platform | Stripe, AWS S3, Resend, Mapbox, Docker, ECR, EC2, Caddy, Cloudflare |
+| Docs | Obsidian vault (domain + flows + ADRs as a linked graph) |
+
+## Open source links
+
+Private product, public org: architecture and shipping cadence stay split (API → `staging-api.tranqui.io`, app → `staging-app.tranqui.io`); the public face is the org.
+
+<LinkCard
+  href='https://github.com/tranqui-org'
+  hostname='github.com'
+  title='tranqui-org on GitHub'
+/>

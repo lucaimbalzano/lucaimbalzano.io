@@ -2,149 +2,63 @@
 
 import { useTranslations } from '@simbashrd/i18n/client'
 import Spline from '@splinetool/react-spline'
-import { AnimatePresence, motion } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { motion } from 'motion/react'
+import { useState } from 'react'
 
-const TEXTS = [
-  {
-    key: 'amazing',
-    className:
-      'bg-clip-text text-center text-transparent bg-linear-to-r from-[#5b8db8] to-[#b8d4e8]'
-  },
-  {
-    key: 'stunning',
-    className:
-      'bg-clip-text text-center text-transparent bg-linear-to-r from-[#7aa8c9] to-[#e8eef2]'
-  },
-  {
-    key: 'fantastic',
-    className:
-      'bg-clip-text text-center text-transparent bg-linear-to-r from-[#81a7c3] to-[#c5d9e8]'
-  },
-  {
-    key: 'attractive',
-    className:
-      'bg-clip-text text-center text-transparent bg-linear-to-r from-[#6b91ad] to-[#a8c4d8]'
-  }
-] as const
+const gradientStyle = {
+  background: 'linear-gradient(90deg, rgb(129 167 195), #FFFFFF 45%, #FFFFFF)',
+  backgroundSize: '200% auto',
+  WebkitBackgroundClip: 'text' as const,
+  color: 'transparent'
+}
 
-const SPEED = 2
+const GradientAccent = (props: { children: React.ReactNode }) => {
+  const { children } = props
+  const [forward, setForward] = useState(() => Math.random() > 0.5)
 
-const variants = {
-  enter: {
-    y: 100,
-    opacity: 0
-  },
-  center: {
-    y: 0,
-    opacity: 1
-  },
-  exit: {
-    y: -100,
-    opacity: 0
-  }
+  return (
+    <motion.span
+      style={gradientStyle}
+      animate={{
+        backgroundPosition: forward ? ['0% 0', '200% 0'] : ['200% 0', '0% 0']
+      }}
+      transition={{ duration: 1.5, ease: 'easeInOut' }}
+      onAnimationComplete={() => {
+        setForward(Math.random() > 0.45)
+      }}
+    >
+      {children}
+    </motion.span>
+  )
 }
 
 const Hero = () => {
-  const [currentIndex, setCurrentIndex] = useState(0)
   const t = useTranslations()
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % TEXTS.length)
-    }, SPEED * 1000)
-
-    return () => {
-      clearInterval(timer)
-    }
-  }, [])
-
-  const textItem = TEXTS[currentIndex]
-  if (!textItem) return null
 
   return (
     <div className='my-16 space-y-6'>
       <div className='flex flex-col justify-between gap-8 md:flex-row md:items-center'>
         <div className='flex flex-col gap-4 text-2xl font-bold sm:text-3xl'>
-          <h1 className='flex flex-col flex-wrap gap-2 text-2xl font-bold sm:text-3xl'>
+          <h1 className='flex flex-col flex-wrap gap-2 text-2xl font-bold text-black sm:text-3xl dark:text-white'>
             <motion.div
               initial={{ x: 20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ ease: 'easeOut' }}
+              className='flex flex-wrap gap-x-2'
             >
-              {t('homepage.hero.title-top')}
-            </motion.div>
-            <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
-              <motion.h1
-                style={{
-                  background: 'linear-gradient(90deg, rgb(129 167 195), #FFFFFF, #FFFFFF)',
-                  backgroundSize: '200% auto',
-                  WebkitBackgroundClip: 'text', // Make the background clip to the text
-                  color: 'transparent' // Text is transparent, the gradient fills it
-                }}
-                animate={{
-                  backgroundPosition: ['200% 0', '0% 0', '200% 0'] // Animate the gradient's position
-                }}
-              >
-                {t('homepage.hero.title-top-second')}
-              </motion.h1>
+              <span>{t('homepage.hero.line-one-prefix')}</span>
+              <GradientAccent>{t('homepage.hero.line-one-accent')}</GradientAccent>
             </motion.div>
             <motion.div
               initial={{ x: 30, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ ease: 'easeOut' }}
-              className='flex gap-2'
+              className='flex flex-wrap gap-x-2'
             >
-              <motion.div
-                layout
-                key='title-middle-left'
-                className='leading-[30px] sm:leading-[45px]'
-              >
-                {t('homepage.hero.title-middle-left')}
-              </motion.div>
-              <div className='relative overflow-hidden'>
-                <AnimatePresence mode='popLayout'>
-                  <motion.div
-                    key={currentIndex}
-                    variants={variants}
-                    initial='enter'
-                    animate='center'
-                    exit='exit'
-                    layout
-                    transition={{
-                      type: 'tween',
-                      duration: 0.3
-                    }}
-                    className='inline-flex items-center justify-center leading-[30px] sm:leading-[45px]'
-                  >
-                    <span className={textItem.className}>{t(`homepage.hero.${textItem.key}`)}</span>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-              <motion.div
-                layout
-                key='title-middle-right'
-                className='leading-[30px] sm:leading-[45px]'
-              >
-                {t('homepage.hero.title-middle-right')}
-              </motion.div>
-            </motion.div>
-            <motion.div
-              initial={{ x: 40, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ ease: 'easeOut' }}
-            >
-              {t('homepage.hero.title-bottom')}
+              <span>{t('homepage.hero.line-two-prefix')}</span>
+              <GradientAccent>{t('homepage.hero.line-two-accent')}</GradientAccent>
             </motion.div>
           </h1>
-          <motion.div
-            initial={{ x: 50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ ease: 'easeOut' }}
-            className='text-muted-foreground text-sm'
-          >
-            {t('homepage.hero.location-timezone')}
-          </motion.div>
         </div>
         <div className='relative h-96 w-96'>
           <Spline
