@@ -1,11 +1,5 @@
 import { type IconType, SiGithub, SiInstagram, SiX } from '@icons-pack/react-simple-icons'
-import {
-  BarChartIcon,
-  FlameIcon,
-  MessageCircleIcon,
-  PencilIcon,
-  UserCircleIcon
-} from 'lucide-react'
+import { FlameIcon, PencilIcon, UserCircleIcon } from 'lucide-react'
 
 import { SITE_GITHUB_URL, SITE_INSTAGRAM_URL, SITE_X_URL } from '@/lib/constants'
 
@@ -20,16 +14,6 @@ export const HEADER_LINKS = [
     icon: <PencilIcon className='size-3.5' />,
     href: '/blog',
     key: 'blog'
-  },
-  {
-    icon: <MessageCircleIcon className='size-3.5' />,
-    href: '/guestbook',
-    key: 'guestbook'
-  },
-  {
-    icon: <BarChartIcon className='size-3.5' />,
-    href: '/dashboard',
-    key: 'dashboard'
   },
   {
     icon: <FlameIcon className='size-3.5' />,
@@ -54,14 +38,12 @@ export const FOOTER_LINKS = [
     links: [
       { href: '/', key: 'home' },
       { href: '/blog', key: 'blog' },
-      { href: '/about', key: 'about' },
-      { href: '/dashboard', key: 'dashboard' }
+      { href: '/about', key: 'about' }
     ]
   },
   {
     id: 2,
     links: [
-      { href: '/guestbook', key: 'guestbook' },
       // { href: '/uses', key: 'uses' },
       { href: '/projects', key: 'projects' }
       // { href: 'https://links.honghong.me', key: 'links' }

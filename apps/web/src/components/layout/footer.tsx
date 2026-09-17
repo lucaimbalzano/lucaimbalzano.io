@@ -6,6 +6,7 @@ import { linkVariants } from '@simbashrd/ui'
 import { StarIcon } from 'lucide-react'
 
 import { FOOTER_LINKS } from '@/config/links'
+import { SITE_GITHUB_REPO_URL } from '@/lib/constants'
 import { api } from '@/trpc/react'
 
 import Link from '../link'
@@ -39,7 +40,7 @@ const Footer = () => {
       <div className='mt-20 flex items-center justify-between text-sm'>
         <div>&copy; {new Date().getFullYear()} Lucas Imba - Simbashrd</div>
         <Link
-          href='https://git.new/FnbdTZm'
+          href={SITE_GITHUB_REPO_URL}
           className='flex items-center justify-center overflow-hidden rounded-md border'
         >
           <div className='bg-muted flex h-8 items-center gap-2 border-r px-2'>
