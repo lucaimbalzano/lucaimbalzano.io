@@ -121,19 +121,6 @@
     },
     "go-to-homepage": "回到首页"
   },
-  "dashboard": {
-    "description": "这是我的个人仪表板，使用 Next.js API 路由建立，并部署为 serverless functions。我使用这个仪表板追踪 YouTube、GitHub 等平台的各种指标。",
-    "metric": {
-      "blog-total-likes": "博客总点赞数",
-      "blog-total-views": "博客总浏览量",
-      "coding-hours": "编程时间",
-      "github-followers": "GitHub 关注者",
-      "github-stars": "GitHub 星数",
-      "youtube-subscribers": "YouTube 订阅者",
-      "youtube-views": "YouTube 浏览量"
-    },
-    "title": "仪表板"
-  },
   "dialog": {
     "sign-in": {
       "continue-with": "使用 {provider} 继续",
@@ -143,28 +130,6 @@
   "error": {
     "something-went-wrong": "出了一些问题！",
     "try-again": "再试一次"
-  },
-  "guestbook": {
-    "create-message-successfully": "成功发布留言",
-    "delete-dialog": {
-      "description": "您确定要删除此评论吗？此操作无法撤销。",
-      "title": "删除评论"
-    },
-    "delete-message-successfully": "成功删除留言",
-    "description": "在我的留言板上留下您的想法。您可以在这里告诉我任何事情！",
-    "failed-to-load-messages": "无法载入留言。请刷新页面。",
-    "message-cannot-be-empty": "留言不能为空",
-    "no-messages": "没有留言，快来成为第一位留言者！",
-    "pinned": {
-      "description": "感谢您造访我的网站。如果您有时间，我很乐意听取您对我作品的看法。请使用您的账户登入以留下评论。谢谢！",
-      "greeting": "嗨！ 👋"
-    },
-    "placeholder": "留言",
-    "signin": {
-      "description": "以留下评论"
-    },
-    "submit": "送出",
-    "title": "留言板"
   },
   "homepage": {
     "about-me": {
@@ -214,10 +179,8 @@
     "about": "关于",
     "blog": "博客",
     "change-language": "更改语言",
-    "dashboard": "仪表板",
     "facebook": "Facebook",
     "github": "GitHub",
-    "guestbook": "留言板",
     "home": "首页",
     "instagram": "Instagram",
     "links": "链接",

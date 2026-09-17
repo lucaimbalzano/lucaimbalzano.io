@@ -121,19 +121,6 @@
     },
     "go-to-homepage": "回到首頁"
   },
-  "dashboard": {
-    "description": "這是我的個人儀表板，使用 Next.js API 路由建立，並部署為 serverless functions。我使用這個儀表板追蹤 YouTube、GitHub 等平台的各種指標。",
-    "metric": {
-      "blog-total-likes": "部落格總按讚數",
-      "blog-total-views": "部落格總瀏覽量",
-      "coding-hours": "編程時間",
-      "github-followers": "GitHub 關注者",
-      "github-stars": "GitHub 星數",
-      "youtube-subscribers": "YouTube 訂閱者",
-      "youtube-views": "YouTube 瀏覽量"
-    },
-    "title": "儀表板"
-  },
   "dialog": {
     "sign-in": {
       "continue-with": "使用 {provider} 繼續",
@@ -143,28 +130,6 @@
   "error": {
     "something-went-wrong": "出了一些問題！",
     "try-again": "再試一次"
-  },
-  "guestbook": {
-    "create-message-successfully": "成功發佈留言",
-    "delete-dialog": {
-      "description": "您確定要刪除此評論嗎？此操作無法撤銷。",
-      "title": "刪除評論"
-    },
-    "delete-message-successfully": "成功刪除留言",
-    "description": "在我的留言板上留下您的想法。您可以在這裡告訴我任何事情！",
-    "failed-to-load-messages": "無法載入留言。請重新整理頁面。",
-    "message-cannot-be-empty": "留言不能為空",
-    "no-messages": "沒有留言，快來成為第一位留言者！",
-    "pinned": {
-      "description": "感謝您造訪我的網站。如果您有時間，我很樂意聽取您對我作品的看法。請使用您的帳戶登入以留下評論。謝謝！",
-      "greeting": "嗨！ 👋"
-    },
-    "placeholder": "留言",
-    "signin": {
-      "description": "以留下評論"
-    },
-    "submit": "送出",
-    "title": "留言板"
   },
   "homepage": {
     "about-me": {
@@ -214,10 +179,8 @@
     "about": "關於",
     "blog": "部落格",
     "change-language": "更改語言",
-    "dashboard": "儀表板",
     "facebook": "Facebook",
     "github": "GitHub",
-    "guestbook": "留言板",
     "home": "首頁",
     "instagram": "Instagram",
     "links": "連結",
