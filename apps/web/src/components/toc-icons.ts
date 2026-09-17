@@ -32,7 +32,10 @@ export const SECTION_ICONS: Record<string, LucideIcon> = {
   'under-the-hood': WorkflowIcon,
   // fin-qdrant-rag
   'multi-agent-orchestration': NetworkIcon,
-  'hybrid-memory': LayersIcon
+  'hybrid-memory': LayersIcon,
+  // kaggle-ml-learning
+  results: TrendingUpIcon,
+  'the-learning-loop': SparklesIcon
 }
 
 export const DEFAULT_SECTION_ICON = LayersIcon

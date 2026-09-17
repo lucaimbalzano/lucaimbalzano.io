@@ -1,0 +1,166 @@
+---
+name: Kaggle ML Learning
+description: First Kaggle competition loop — House Prices with a Random Forest, honest holdout MAE, and a clean submission.csv.
+github: https://github.com/lucaimbalzano/kaggle-machine-learning-learning
+selected: true
+techstack:
+  - Python
+  - pandas
+  - scikit-learn
+  - Jupyter
+  - Kaggle
+---
+
+## Preface
+
+**Kaggle ML Learning** is where I ran the full competition loop for the first time: load Iowa house data, pick a lean feature set, measure with a holdout, refit on all labels, predict the test file, ship `submission.csv`.
+
+It started as the Kaggle Learn *Machine Learning Competitions* exercise and lives on as a personal archive of that first end-to-end submit.
+
+<LinkCard
+  href='https://github.com/lucaimbalzano/kaggle-machine-learning-learning'
+  hostname='github.com'
+  title='kaggle-machine-learning-learning on GitHub'
+/>
+
+## The problem
+
+Predict `SalePrice` for homes in the [Home Data for ML Course](https://www.kaggle.com/c/home-data-for-ml-course) competition. Classic tabular regression: many columns, a public leaderboard, and an easy trap — treating training error as if it were validation.
+
+The goal for this exercise was not a fancy stack. It was **discipline**: same feature schema on train and test, a real holdout score before submit, then a full-data refit for the CSV Kaggle expects.
+
+## Results
+
+<Table
+  headers={['Metric', 'Value', 'Meaning']}
+  rows={[
+    ['Holdout MAE', '~21,857', 'Fit on a train split, scored on unseen validation rows'],
+    ['Train MAE (full fit)', '~8,300', 'Scored on data it just saw — optimistic, not a validation claim'],
+    ['Output', 'submission.csv', 'Id + SalePrice for the competition test set']
+  ]}
+/>
+
+The gap between those MAEs is the lesson: a good programmer trusts the holdout, not the flattering number.
+
+<Image
+  src='/images/projects/kaggle-ml-learning/preview.png'
+  width={1600}
+  height={900}
+  alt='House Prices — first Kaggle competition loop with Random Forest and holdout MAE'
+/>
+
+## Folder structure
+
+Intentionally small — one exercise folder, one notebook, room to grow.
+
+<TreeView
+  defaultExpandedValue={['exercise-machine-learning-competitions']}
+  collection={{
+    id: 'ROOT',
+    name: '',
+    children: [
+      {
+        id: 'exercise-machine-learning-competitions',
+        name: 'exercise-machine-learning-competitions',
+        children: [
+          {
+            id: 'exercise-notebook',
+            name: 'exercise-machine-learning-competitions.ipynb'
+          }
+        ]
+      },
+      { id: 'README', name: 'README.md' },
+      { id: 'LICENSE', name: 'LICENSE' }
+    ]
+  }}
+/>
+
+## Under the hood
+
+Two snippets that matter more than the algorithm choice: **measure before you submit**, and **keep the feature contract identical** on test.
+
+### Holdout first — then refit for the leaderboard
+
+```python title='exercise-machine-learning-competitions.ipynb'
+features = [
+    'LotArea', 'YearBuilt', '1stFlrSF', '2ndFlrSF',
+    'FullBath', 'BedroomAbvGr', 'TotRmsAbvGrd',
+]
+X = home_data[features]
+y = home_data.SalePrice
+
+train_X, val_X, train_y, val_y = train_test_split(X, y, random_state=1)
+
+rf_model = RandomForestRegressor(random_state=1)
+rf_model.fit(train_X, train_y)
+rf_val_mae = mean_absolute_error(rf_model.predict(val_X), val_y)
+# holdout MAE ≈ 21,857 — the number you can defend
+
+rf_model_on_full_data = RandomForestRegressor(random_state=1)
+rf_model_on_full_data.fit(X, y)  # all labels only after you have a local score
+```
+
+### Same columns on test — competition CSV shape
+
+```python title='exercise-machine-learning-competitions.ipynb'
+test_X = test_data[features]  # identical schema to train X
+test_preds = rf_model_on_full_data.predict(test_X)
+
+output = pd.DataFrame({'Id': test_data.Id, 'SalePrice': test_preds})
+output.to_csv('submission.csv', index=False)
+```
+
+Small details, strong habit: one `features` list, `random_state` for reproducibility, and a submission frame that matches the competition contract exactly.
+
+## Tech stack
+
+<ItemGrid
+  items={[
+    {
+      image: '/images/projects/kaggle-ml-learning/icons/python.png',
+      name: 'Python',
+      description: 'Notebook runtime',
+      url: 'https://www.python.org'
+    },
+    {
+      image: '/images/projects/kaggle-ml-learning/icons/pandas.png',
+      name: 'pandas',
+      description: 'Tabular I/O',
+      url: 'https://pandas.pydata.org'
+    },
+    {
+      image: '/images/projects/kaggle-ml-learning/icons/scikitlearn.png',
+      name: 'scikit-learn',
+      description: 'RandomForest + MAE',
+      url: 'https://scikit-learn.org'
+    },
+    {
+      image: '/images/projects/kaggle-ml-learning/icons/jupyter.png',
+      name: 'Jupyter',
+      description: 'Exercise notebook',
+      url: 'https://jupyter.org'
+    },
+    {
+      image: '/images/projects/kaggle-ml-learning/icons/kaggle.png',
+      name: 'Kaggle',
+      description: 'Competition + Learn',
+      url: 'https://www.kaggle.com'
+    }
+  ]}
+/>
+
+## Open source & links
+
+<LinkCard
+  href='https://github.com/lucaimbalzano/kaggle-machine-learning-learning'
+  hostname='github.com'
+  title='View on GitHub'
+/>
+
+<LinkCard
+  href='https://www.kaggle.com/code/francescoimbalzano/exercise-machine-learning-competitions?scriptVersionId=241262910'
+  hostname='kaggle.com'
+  title='Kaggle notebook'
+/>
+
+Next stops on this track: missing values, categoricals, and a stronger booster baseline — still with the same holdout-before-submit muscle memory.
