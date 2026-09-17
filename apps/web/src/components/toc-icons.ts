@@ -29,7 +29,10 @@ export const SECTION_ICONS: Record<string, LucideIcon> = {
   // nested-set-org-chart
   'nested-set-model': NetworkIcon,
   'folder-structure': FolderTreeIcon,
-  'under-the-hood': WorkflowIcon
+  'under-the-hood': WorkflowIcon,
+  // fin-qdrant-rag
+  'multi-agent-orchestration': NetworkIcon,
+  'hybrid-memory': LayersIcon
 }
 
 export const DEFAULT_SECTION_ICON = LayersIcon

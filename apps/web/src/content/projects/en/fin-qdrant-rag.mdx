@@ -1,0 +1,410 @@
+---
+name: fin-qdrant-rag
+description: Finance RAG chatbot — hybrid Redis/Qdrant memory, query amplification, and strategy-gated long-term recall over trading PDFs.
+github: https://github.com/lucaimbalzano/fin-qdrant-rag
+selected: true
+techstack:
+  - FastAPI
+  - Qdrant
+  - OpenAI
+  - Redis
+  - PostgreSQL
+  - Python
+  - React
+  - Docker
+---
+
+## Preface
+
+**fin-qdrant-rag** is a Retrieval-Augmented Generation stack for finance and trading PDFs. You upload books and reports, they get chunked and embedded into **Qdrant**, and a FastAPI chat layer answers questions with retrieved document context plus conversation memory.
+
+The interesting part is not “call an LLM with a vector search.” It is how several specialized roles cooperate on every turn: expand the query, retrieve in parallel, fall back when recall is empty, rerank, then decide what is worth keeping in long-term memory.
+
+<LinkCard
+  href='https://github.com/lucaimbalzano/fin-qdrant-rag'
+  hostname='github.com'
+  title='fin-qdrant-rag on GitHub'
+/>
+
+## The problem
+
+Plain chat models do not know your PDFs. A single embedding search also fails often:
+
+- Users ask the same idea with different wording
+- Session chatter pollutes the prompt if you dump the whole history
+- Important insights get lost when Redis TTL expires
+- Naïve “store everything in the vector DB” creates noise and cost
+
+This project splits **short-term speed**, **long-term semantics**, and **document knowledge** into separate stores, then orchestrates them like a small crew of specialists on each message.
+
+## Product preview
+
+Chat UI on the assistant surface — upload PDFs, ask finance questions, keep session context warm.
+
+<Image
+  src='/images/projects/fin-qdrant-rag/cover.png'
+  width={1479}
+  height={971}
+  alt='fin-qdrant-rag finance assistant cover'
+/>
+
+<Image
+  src='/images/projects/fin-qdrant-rag/preview.jpg'
+  width={1280}
+  height={1118}
+  alt='Finance assistant chat UI preview'
+/>
+
+## Multi-agent orchestration
+
+I did not bolt on a heavy agent framework. Instead I shaped the request path as **cooperating specialists** with clear contracts — closer to a production multi-agent layout than a single monolith function.
+
+```text
+User message
+    │
+    ▼
+┌───────────────────┐
+│  Chat / RAG hub   │  ChatService → RAGService
+└─────────┬─────────┘
+          │
+          ▼
+┌───────────────────┐
+│ HybridMemory      │  Facade that dispatches to specialists
+│ Manager           │
+└─────────┬─────────┘
+          │
+    ┌─────┼──────────────────────────────┐
+    ▼     ▼                              ▼
+ Redis   Strategy crew              Amplification crew
+ short-  Conversation / Insight /   Sub-questions → parallel
+ term    Risk scorers               search → keyword fallback
+         (long-term gate)           → LLM rerank over PDFs
+```
+
+### Amplification crew (document recall)
+
+When a question hits the knowledge base, one role **rewrites** it into sub-questions, several roles **search in parallel**, a fallback role extracts **keywords** if vectors miss, and a final role **reranks** chunks with a score threshold before they enter the prompt.
+
+### Memory strategy crew (what to remember)
+
+After the reply, Conversation / Insight / Risk strategies score the exchange. Only turns above an importance threshold are promoted from Redis into the Qdrant `conversations` collection — so long-term memory stays curated instead of becoming a dump.
+
+## Folder structure
+
+Clear separation: `src/core/` owns memory and clients, `src/features/` owns HTTP and services, `docker/` brings up Postgres, Redis, Qdrant, API, and the React UI.
+
+<TreeView
+  defaultExpandedValue={['src', 'src/core', 'src/features', 'src/features/services', 'src/features/endpoints', 'frontend', 'frontend/src', 'docker']}
+  collection={{
+    id: 'ROOT',
+    name: '',
+    children: [
+      {
+        id: 'src',
+        name: 'src',
+        children: [
+          { id: 'src/main', name: 'main.py' },
+          {
+            id: 'src/core',
+            name: 'core',
+            children: [
+              { id: 'src/core/hybrid', name: 'hybrid_memory_manager.py' },
+              { id: 'src/core/strategy', name: 'memory_strategy.py' },
+              { id: 'src/core/qdrant', name: 'qdrant_client.py' },
+              { id: 'src/core/openai', name: 'openai_client.py' },
+              { id: 'src/core/redis', name: 'redis_memory_manager.py' },
+              { id: 'src/core/utils', name: 'utils/' }
+            ]
+          },
+          {
+            id: 'src/features',
+            name: 'features',
+            children: [
+              {
+                id: 'src/features/endpoints',
+                name: 'endpoints',
+                children: [
+                  { id: 'src/features/endpoints/chat', name: 'chat.py' },
+                  { id: 'src/features/endpoints/upload', name: 'upload.py' }
+                ]
+              },
+              {
+                id: 'src/features/services',
+                name: 'services',
+                children: [
+                  { id: 'src/features/services/rag', name: 'rag_service.py' },
+                  { id: 'src/features/services/chat', name: 'chat_service.py' }
+                ]
+              },
+              { id: 'src/features/models', name: 'models/' }
+            ]
+          },
+          { id: 'src/database', name: 'database/' },
+          { id: 'src/tests', name: 'tests/' }
+        ]
+      },
+      {
+        id: 'frontend',
+        name: 'frontend',
+        children: [
+          {
+            id: 'frontend/src',
+            name: 'src',
+            children: [
+              { id: 'frontend/src/components', name: 'components/' },
+              { id: 'frontend/src/hooks', name: 'hooks/useChat' },
+              { id: 'frontend/src/services', name: 'services/api.ts' }
+            ]
+          },
+          { id: 'frontend/public', name: 'public/' }
+        ]
+      },
+      {
+        id: 'docker',
+        name: 'docker',
+        children: [
+          { id: 'docker/compose', name: 'docker-compose.yml' },
+          { id: 'docker/api', name: 'Dockerfile.api' },
+          { id: 'docker/frontend', name: 'Dockerfile.frontend' }
+        ]
+      },
+      { id: 'data', name: 'data/md/' },
+      { id: 'Makefile', name: 'Makefile' },
+      { id: 'pyproject', name: 'pyproject.toml' }
+    ]
+  }}
+/>
+
+## Architecture
+
+End-to-end path: React hits `/chat` and `/upload`; the API fans out to Redis (short-term), Qdrant (`conversations` + `pdf_documents`), Postgres (persist), and OpenAI for embed / amplify / answer.
+
+<Image
+  src='/images/projects/fin-qdrant-rag/schema.png'
+  width={2251}
+  height={1614}
+  alt='fin-qdrant-rag schema — upload pipeline, hybrid context, Redis, Qdrant, Postgres, and OpenAI'
+/>
+
+```text
+┌──────────────┐   HTTP    ┌─────────────────────┐
+│  React chat  │ ────────► │  FastAPI · RAG hub  │
+│  Vite · hooks│           │  Chat + upload APIs │
+└──────────────┘           └──────────┬──────────┘
+                                      │
+         ┌────────────────────────────┼────────────────────────────┐
+         ▼                            ▼                            ▼
+   ┌───────────┐               ┌────────────┐               ┌────────────┐
+   │ Redis     │               │ PostgreSQL │               │ Qdrant     │
+   │ short-term│               │ chat rows  │               │ pdf_docs + │
+   │ TTL list  │               │            │               │ conversations│
+   └───────────┘               └────────────┘               └──────┬─────┘
+                                                                   │
+                                                            ┌──────▼─────┐
+                                                            │  OpenAI    │
+                                                            │ embed/chat │
+                                                            │ sub-Q/rerank│
+                                                            └────────────┘
+```
+
+Two Qdrant collections keep concerns clean: `pdf_documents` for ingested knowledge, `conversations` for curated long-term dialogue memory.
+
+## Hybrid memory
+
+Every prompt can pull three layers:
+
+<Table
+  headers={['Layer', 'Store', 'Job']}
+  rows={[
+    ['Short-term', 'Redis list + TTL', 'Recent turns — fast, session-scoped'],
+    ['Long-term', 'Qdrant conversations', 'Only high-importance exchanges'],
+    ['Knowledge', 'Qdrant pdf_documents', 'Chunked PDFs via amplification crew']
+  ]}
+/>
+
+`HybridMemoryManager` is the facade: one call assembles short-term text, similar long-term memories, and amplified PDF chunks into a single context block for the chat model.
+
+## Under the hood
+
+Three geeky pieces worth reading: parallel amplification, strategy-gated storage, and dual collection factories.
+
+### Query amplification with parallel retrieval
+
+Sub-questions fan out with `asyncio.gather`, results are deduped, then an LLM reranker drops weak chunks below the threshold.
+
+```python title='src/core/hybrid_memory_manager.py'
+async def amplify_pdf_context(
+    self, user_message: str, pdf_limit: int = 5, rerank_threshold: float = 0.5
+):
+    sub_questions = await self.openai_client.generate_sub_questions(user_message, n=3)
+
+    async def fetch_chunks(query):
+        embedding = (await self.openai_client.get_embeddings([query]))[0]
+        return await self.pdf_memory.search_similar_memories(
+            query_embedding=embedding,
+            user_id=None,
+            limit=pdf_limit,
+        )
+
+    results = await asyncio.gather(*(fetch_chunks(q) for q in sub_questions))
+
+    # dedupe → keyword fallback if empty → OpenAI rerank with threshold
+    ...
+    if all_chunks:
+        all_chunks = await self.openai_client.rerank_chunks_with_threshold(
+            user_message, all_chunks, threshold=rerank_threshold
+        )
+    return all_chunks
+```
+
+### Strategy crew decides what becomes long-term memory
+
+Each strategy votes with `should_store` + an importance score. The factory keeps the best score; only values above `0.5` promote a turn into Qdrant.
+
+```python title='src/core/memory_strategy.py'
+@classmethod
+def evaluate_content(cls, content: str, metadata: Dict[str, Any]) -> Dict[str, Any]:
+    results = {}
+    max_score = 0.0
+    best_strategy = None
+
+    for strategy in cls.get_all_strategies():
+        strategy_name = strategy.get_memory_type()
+        should_store = strategy.should_store(content, metadata)
+        importance_score = strategy.get_importance_score(content, metadata)
+
+        results[strategy_name] = {
+            "should_store": should_store,
+            "importance_score": importance_score,
+            "memory_type": strategy.get_memory_type(),
+        }
+
+        if should_store and importance_score > max_score:
+            max_score = importance_score
+            best_strategy = strategy_name
+
+    return {
+        "strategies": results,
+        "should_store_in_long_term": max_score > 0.5,
+        "best_strategy": best_strategy,
+        "overall_importance": max_score,
+    }
+```
+
+### Dual Qdrant collections from one client
+
+Factory constructors keep PDF knowledge and conversation memory on separate collections without duplicating client logic.
+
+```python title='src/core/qdrant_client.py'
+@classmethod
+def for_pdfs(cls, qdrant_url: str = None):
+    return cls(collection_name="pdf_documents", qdrant_url=qdrant_url)
+
+@classmethod
+def for_conversations(cls, qdrant_url: str = None):
+    return cls(collection_name="conversations", qdrant_url=qdrant_url)
+```
+
+## Features
+
+<FeatureGrid
+  items={[
+    {
+      icon: 'Workflow',
+      title: 'Multi-role retrieval',
+      description: 'Sub-questions, parallel search, keyword fallback, and LLM rerank on every document recall.'
+    },
+    {
+      icon: 'MemoryStick',
+      title: 'Hybrid memory',
+      description: 'Redis for the live session, Qdrant for curated long-term turns and PDF knowledge.'
+    },
+    {
+      icon: 'Sparkles',
+      title: 'Strategy-gated storage',
+      description: 'Conversation / Insight / Risk scorers decide what survives beyond TTL.'
+    },
+    {
+      icon: 'Database',
+      title: 'Dual vector collections',
+      description: 'pdf_documents and conversations stay isolated behind one Qdrant client API.'
+    },
+    {
+      icon: 'Search',
+      title: 'PDF ingest pipeline',
+      description: 'Upload → extract → chunk → embed → index, ready for chat in the same stack.'
+    },
+    {
+      icon: 'Layers',
+      title: 'Docker Compose stack',
+      description: 'Postgres, Redis, Qdrant, FastAPI, and the React chat UI from one compose file.'
+    }
+  ]}
+/>
+
+## Tech stack
+
+<ItemGrid
+  items={[
+    {
+      image: '/images/projects/fin-qdrant-rag/icons/fastapi.png',
+      name: 'FastAPI',
+      description: 'Async API layer',
+      url: 'https://fastapi.tiangolo.com'
+    },
+    {
+      image: '/images/projects/fin-qdrant-rag/icons/qdrant.png',
+      name: 'Qdrant',
+      description: 'Vector memory',
+      url: 'https://qdrant.tech'
+    },
+    {
+      image: '/images/projects/fin-qdrant-rag/icons/openai.png',
+      name: 'OpenAI',
+      description: 'Embed + chat + rerank',
+      url: 'https://openai.com'
+    },
+    {
+      image: '/images/projects/fin-qdrant-rag/icons/redis.png',
+      name: 'Redis',
+      description: 'Short-term memory',
+      url: 'https://redis.io'
+    },
+    {
+      image: '/images/projects/fin-qdrant-rag/icons/postgresql.png',
+      name: 'PostgreSQL',
+      description: 'Chat persistence',
+      url: 'https://www.postgresql.org'
+    },
+    {
+      image: '/images/projects/fin-qdrant-rag/icons/python.png',
+      name: 'Python',
+      description: 'Backend runtime',
+      url: 'https://www.python.org'
+    },
+    {
+      image: '/images/projects/fin-qdrant-rag/icons/react.png',
+      name: 'React',
+      description: 'Chat UI',
+      url: 'https://react.dev'
+    },
+    {
+      image: '/images/projects/fin-qdrant-rag/icons/docker.png',
+      name: 'Docker',
+      description: 'Full local stack',
+      url: 'https://www.docker.com'
+    }
+  ]}
+/>
+
+## Open source & links
+
+Makefile targets, compose services, and the full memory design notes live in the repository.
+
+<LinkCard
+  href='https://github.com/lucaimbalzano/fin-qdrant-rag'
+  hostname='github.com'
+  title='View on GitHub'
+/>
+
+If you care about **retrieval that behaves like a small specialist crew** — expand, search, fall back, rerank, then remember selectively — this is the project where hybrid memory stops being a buzzword and becomes the runtime path.

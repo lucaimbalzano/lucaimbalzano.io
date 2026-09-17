@@ -10,10 +10,13 @@ import {
   LayersIcon,
   type LucideIcon,
   MapPinnedIcon,
+  MemoryStickIcon,
   NetworkIcon,
   SearchIcon,
   ShieldCheckIcon,
-  UsersIcon
+  SparklesIcon,
+  UsersIcon,
+  WorkflowIcon
 } from 'lucide-react'
 
 const iconMap = {
@@ -25,10 +28,13 @@ const iconMap = {
   Languages: LanguagesIcon,
   Layers: LayersIcon,
   MapPinned: MapPinnedIcon,
+  MemoryStick: MemoryStickIcon,
   Network: NetworkIcon,
   Search: SearchIcon,
   ShieldCheck: ShieldCheckIcon,
-  Users: UsersIcon
+  Sparkles: SparklesIcon,
+  Users: UsersIcon,
+  Workflow: WorkflowIcon
 } as const satisfies Record<string, LucideIcon>
 
 type IconName = keyof typeof iconMap
