@@ -1,4 +1,4 @@
-import { eq, likesSessions, posts, sql, sum } from '@simbashrd/db'
+import { eq, likesSessions, posts, sql } from '@simbashrd/db'
 import { env } from '@simbashrd/env'
 import { ratelimit, redis, redisKeys } from '@simbashrd/kv'
 import { TRPCError } from '@trpc/server'
@@ -18,35 +18,6 @@ const getSessionId = (slug: string, ip: string): string => {
 const getKey = (id: string) => `likes:${id}`
 
 export const likesRouter = createTRPCRouter({
-  getCount: publicProcedure.query(async ({ ctx }) => {
-    const ip = getIp(ctx.headers)
-
-    const { success } = await ratelimit.limit(getKey(`getCount:${ip}`))
-
-    if (!success) throw new TRPCError({ code: 'TOO_MANY_REQUESTS' })
-
-    const cachedLikeCount = await redis.get<number>(redisKeys.postLikeCount)
-
-    if (cachedLikeCount) {
-      return {
-        likes: cachedLikeCount
-      }
-    }
-
-    const result = await ctx.db
-      .select({
-        value: sum(likesSessions.likes)
-      })
-      .from(posts)
-
-    const likes = result[0]?.value ? Number(result[0].value) : 0
-
-    await redis.set(redisKeys.postLikeCount, likes)
-
-    return {
-      likes
-    }
-  }),
   get: publicProcedure
     .input(
       z.object({

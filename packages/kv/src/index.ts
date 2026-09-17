@@ -22,9 +22,7 @@ export const ratelimit = new Ratelimit({
 
 export const redisKeys = {
   postViews: (slug: string) => `post:views:${slug}`,
-  postViewCount: 'post:views:count',
   postLikes: (slug: string) => `post:likes:${slug}`,
-  postLikeCount: 'post:likes:count',
   currentUserLikes: (slug: string, sessionId: string) =>
     `post:likes:${slug}:current-user-likes:${sessionId}`
 }

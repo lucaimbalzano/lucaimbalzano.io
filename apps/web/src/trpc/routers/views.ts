@@ -1,4 +1,4 @@
-import { eq, posts, sql, sum } from '@simbashrd/db'
+import { eq, posts, sql } from '@simbashrd/db'
 import { ratelimit, redis, redisKeys } from '@simbashrd/kv'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
@@ -10,35 +10,6 @@ import { createTRPCRouter, publicProcedure } from '../trpc'
 const getKey = (id: string) => `views:${id}`
 
 export const viewsRouter = createTRPCRouter({
-  getCount: publicProcedure.query(async ({ ctx }) => {
-    const ip = getIp(ctx.headers)
-
-    const { success } = await ratelimit.limit(getKey(`getCount:${ip}`))
-
-    if (!success) throw new TRPCError({ code: 'TOO_MANY_REQUESTS' })
-
-    const cachedViewCount = await redis.get<number>(redisKeys.postViewCount)
-
-    if (cachedViewCount) {
-      return {
-        views: cachedViewCount
-      }
-    }
-
-    const result = await ctx.db
-      .select({
-        value: sum(posts.views)
-      })
-      .from(posts)
-
-    const value = result[0]?.value ? Number(result[0].value) : 0
-
-    await redis.set(redisKeys.postViewCount, value)
-
-    return {
-      views: value
-    }
-  }),
   get: publicProcedure
     .input(z.object({ slug: z.string().min(1) }))
     .query(async ({ ctx, input }) => {
