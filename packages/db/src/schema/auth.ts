@@ -3,7 +3,6 @@ import { relations } from 'drizzle-orm'
 import { integer, pgEnum, pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core'
 
 import { comments } from './comments'
-import { guestbook } from './guestbook'
 
 export const roleEnum = pgEnum('role', ['user', 'admin'])
 
@@ -71,8 +70,7 @@ export const verificationTokens = pgTable(
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
   sessions: many(sessions),
-  comments: many(comments),
-  guestbook: many(guestbook)
+  comments: many(comments)
 }))
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
