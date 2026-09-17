@@ -1,0 +1,235 @@
+---
+name: houseav
+description: A faith-community housing platform that helps Christians share homes safely — 5k community reach, 100 verified users.
+homepage: https://houseav.life/
+github: https://github.com/houseav
+selected: true
+techstack:
+  - TypeScript
+  - React
+  - Vite
+  - Tailwind CSS
+  - NestJS
+  - PostgreSQL
+  - Leaflet
+---
+
+## Preface
+
+**houseav** (AV = *availability*) is a housing marketplace built for a faith community — not a generic Airbnb clone. The goal is simple: help Christians **list spare rooms and homes**, and help others **find a place to stay**, inside a network where trust is earned through church affiliation and pastoral references.
+
+I designed and shipped the full stack: a React/Vite SPA on the frontend and a NestJS + PostgreSQL API on the backend, live at [houseav.life](https://houseav.life/).
+
+<LinkCard href='https://houseav.life/' hostname='houseav.life' title='houseav' />
+
+## Traction
+
+What started as a product idea grew into a real community network:
+
+<Table
+  headers={['Metric', 'Value', 'Notes']}
+  rows={[
+    ['Community network', '5,000+', 'People reached across the church network'],
+    ['Platform users', '100+', 'Members who registered on houseav'],
+    ['Trust model', 'Verified', 'Pastoral reference + admin review before going live'],
+    ['Languages', '5', 'EN · IT · FR · ES · PT']
+  ]}
+/>
+
+## Product preview
+
+Scrolling the product shows the core loop clearly: discover availability on a map, open a listing, and reach the host through contact channels designed for real-world coordination.
+
+<Image
+  src='/images/projects/houseav/preview.png'
+  width={2592}
+  height={1290}
+  alt='houseav product preview — search, listings, and community housing'
+/>
+
+<Image
+  src='/images/projects/houseav/homepage.png'
+  width={1070}
+  height={959}
+  alt='houseav homepage visual — room and home availability'
+/>
+
+## The problem
+
+Finding housing inside a church community usually happens in WhatsApp groups, word of mouth, or Facebook posts. That works until it doesn’t:
+
+- Posts get lost and can’t be filtered (wifi, parking, dates, roommate prefs)
+- There’s no shared standard for **who is trusted**
+- Hosts have no structured way to publish availability
+- Admins have no ops view of pending people or listings
+
+houseav turns that informal network into a **moderated platform** with maps, filters, and verification.
+
+## How trust works
+
+This is the product’s differentiator. New members don’t drop into a public feed on day one.
+
+1. **Multi-step signup** — profile details plus church affiliation
+2. **Pastoral reference letter** — pastor/leader confirmation (time in church, baptism, optional guardian)
+3. **Pending role** — signed in, but gated until review
+4. **Admin queue** — church-scoped admins verify the person
+5. **Listing moderation** — hosts publish homes, then listings go through a second review queue before they appear in search
+
+Transactional emails (Mailgun) follow the lifecycle: signup, “house in review”, user verified, house verified, password recovery.
+
+## Features
+
+<FeatureGrid
+  items={[
+    {
+      icon: 'ShieldCheck',
+      title: 'Trusted verification',
+      description: 'Pastoral reference letters and admin review queues before members go live.'
+    },
+    {
+      icon: 'Church',
+      title: 'Church network',
+      description: 'Listings stay scoped to a faith community — not a public open market.'
+    },
+    {
+      icon: 'Home',
+      title: 'Host & seek homes',
+      description: 'Publish rooms or homes, search with filters, and manage your own listings.'
+    },
+    {
+      icon: 'MapPinned',
+      title: 'Map-aware search',
+      description: 'Leaflet maps, clustered markers, and a privacy radius around addresses.'
+    },
+    {
+      icon: 'Users',
+      title: 'Admin operations',
+      description: 'Dashboard stats, user queues, and listing moderation for church admins.'
+    },
+    {
+      icon: 'Languages',
+      title: 'Multilingual UI',
+      description: 'Product experience in English, Italian, French, Spanish, and Portuguese.'
+    }
+  ]}
+/>
+
+### For hosts
+
+Create a listing with amenities (beds, baths, furnished, parking, wifi), availability windows, roommate preferences, pets/allergies, transport notes, and photos. Addresses are geocoded and stored as map geometry so seekers can discover them spatially.
+
+### For seekers
+
+Authenticated search with filters, map markers with clustering, listing detail pages, and host contact via **WhatsApp** or revealed phone/email — built for real conversations, not an in-app inbox.
+
+### For admins
+
+A dashboard with counts, church-scoped registration queues, and listing verification — so the community stays intentional as it scales past informal group chats.
+
+## Architecture
+
+```text
+┌─────────────────────┐       ┌──────────────────────────┐
+│  houseav.frontend   │  API  │  houseav.backend         │
+│  React · Vite · RTL │ ────► │  NestJS · TypeORM · JWT  │
+│  Leaflet · Firebase │       │  PostgreSQL (+ geometry) │
+│  i18next · Redux    │       │  Mailgun · Swagger       │
+└─────────────────────┘       └──────────────────────────┘
+         │                              │
+         │ Docker / Caddy               │ Docker / Railway-ready
+         ▼                              ▼
+              https://houseav.life/
+```
+
+### Frontend highlights
+
+- React 19 + Vite + Tailwind CSS
+- Redux Toolkit (persisted session state)
+- React Router private routes for the authenticated app
+- Leaflet / react-leaflet for search maps and address privacy radius (~500m)
+- Firebase Storage for compressed listing images
+- i18next across five locales (default cookie locale: Italian)
+
+### Backend highlights
+
+- NestJS modular API (`auth`, `user`, `house`, `church`, `reference-letter`, queues, `mailgun`, …)
+- Passport JWT access + refresh tokens with session history
+- Role guards (`admin`, `super-admin`) on verification queues
+- TypeORM entities for users, houses, churches, map geometry, policies, banners
+- Rate limiting (stricter on sign-in), Helmet, Swagger docs at `/docs`
+- PostgreSQL with geographic `Point` data for listings
+
+## Tech stack
+
+<ItemGrid
+  items={[
+    {
+      image: '/images/projects/houseav/icons/react.png',
+      name: 'React',
+      description: 'SPA UI',
+      url: 'https://react.dev'
+    },
+    {
+      image: '/images/projects/houseav/icons/vite.png',
+      name: 'Vite',
+      description: 'Frontend tooling',
+      url: 'https://vitejs.dev'
+    },
+    {
+      image: '/images/projects/houseav/icons/tailwindcss.png',
+      name: 'Tailwind CSS',
+      description: 'Styling',
+      url: 'https://tailwindcss.com'
+    },
+    {
+      image: '/images/projects/houseav/icons/typescript.png',
+      name: 'TypeScript',
+      description: 'Typed backend',
+      url: 'https://www.typescriptlang.org'
+    },
+    {
+      image: '/images/projects/houseav/icons/nestjs.png',
+      name: 'NestJS',
+      description: 'API framework',
+      url: 'https://nestjs.com'
+    },
+    {
+      image: '/images/projects/houseav/icons/postgresql.png',
+      name: 'PostgreSQL',
+      description: 'Primary database',
+      url: 'https://www.postgresql.org'
+    },
+    {
+      image: '/images/projects/houseav/icons/leaflet.png',
+      name: 'Leaflet',
+      description: 'Maps & clusters',
+      url: 'https://leafletjs.com'
+    },
+    {
+      image: '/images/projects/houseav/icons/firebase.png',
+      name: 'Firebase',
+      description: 'Image storage',
+      url: 'https://firebase.google.com'
+    },
+    {
+      image: '/images/projects/houseav/icons/docker.png',
+      name: 'Docker',
+      description: 'Containers',
+      url: 'https://www.docker.com'
+    },
+    {
+      image: '/images/projects/houseav/icons/railway.png',
+      name: 'Railway',
+      description: 'Deploy target',
+      url: 'https://railway.app'
+    }
+  ]}
+/>
+
+## Open source & links
+
+The organization and platform live on GitHub. Frontend and backend are separate repos under the same product umbrella.
+
+<LinkCard href='https://github.com/houseav' hostname='github.com' title='houseav on GitHub' />
+
+If you’re building community products where **trust matters more than growth hacks**, houseav is the project I’m most proud of — a full product loop from pastoral verification to map search, shipped end to end.
