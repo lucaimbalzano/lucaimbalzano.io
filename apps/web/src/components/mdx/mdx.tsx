@@ -4,7 +4,9 @@ import { BlurImage, CodeBlock, Kbd } from '@simbashrd/ui'
 import ImageZoom from '../image-zoom'
 import Link from '../link'
 
+import FeatureGrid from './feature-grid'
 import Heading from './heading'
+import Icon from './icon'
 import ItemGrid from './item-grid'
 import LinkCard from './link-card'
 import Logo from './logo'
@@ -51,6 +53,8 @@ const components = {
   // Custom components
   Table,
   ItemGrid,
+  FeatureGrid,
+  Icon,
   Video,
   LinkCard,
   Logo,
