@@ -8,7 +8,6 @@ export const flags = {
   stats: process.env.NEXT_PUBLIC_FLAG_STATS === 'true',
   spotify: process.env.NEXT_PUBLIC_FLAG_SPOTIFY === 'true',
   analytics: process.env.NEXT_PUBLIC_FLAG_ANALYTICS === 'true',
-  guestbookNotification: process.env.NEXT_PUBLIC_FLAG_GUESTBOOK_NOTIFICATION === 'true',
   likeButton: process.env.NEXT_PUBLIC_FLAG_LIKE_BUTTON === 'true'
 }
 
@@ -41,7 +40,6 @@ export const env = createEnv({
 
     ...(flags.stats
       ? {
-          GOOGLE_API_KEY: z.string().min(1).optional(),
           GITHUB_TOKEN: z.string().min(1),
           WAKATIME_API_KEY: z.string().min(1)
         }
@@ -49,12 +47,6 @@ export const env = createEnv({
 
     ...(flags.comment
       ? { RESEND_API_KEY: z.string().min(1), AUTHOR_EMAIL: z.string().email() }
-      : {}),
-
-    ...(flags.guestbookNotification
-      ? {
-          DISCORD_WEBHOOK_URL: z.string().url().optional()
-        }
       : {}),
 
     ...(flags.likeButton
@@ -81,7 +73,6 @@ export const env = createEnv({
     NEXT_PUBLIC_FLAG_STATS: z.string().min(1).optional(),
     NEXT_PUBLIC_FLAG_SPOTIFY: z.string().min(1).optional(),
     NEXT_PUBLIC_FLAG_ANALYTICS: z.string().min(1).optional(),
-    NEXT_PUBLIC_FLAG_GUESTBOOK_NOTIFICATION: z.string().min(1).optional(),
     NEXT_PUBLIC_FLAG_LIKE_BUTTON: z.string().min(1).optional()
   },
   experimental__runtimeEnv: {
@@ -95,7 +86,6 @@ export const env = createEnv({
     NEXT_PUBLIC_FLAG_STATS: process.env.NEXT_PUBLIC_FLAG_STATS,
     NEXT_PUBLIC_FLAG_SPOTIFY: process.env.NEXT_PUBLIC_FLAG_SPOTIFY,
     NEXT_PUBLIC_FLAG_ANALYTICS: process.env.NEXT_PUBLIC_FLAG_ANALYTICS,
-    NEXT_PUBLIC_FLAG_GUESTBOOK_NOTIFICATION: process.env.NEXT_PUBLIC_FLAG_GUESTBOOK_NOTIFICATION,
     NEXT_PUBLIC_FLAG_LIKE_BUTTON: process.env.NEXT_PUBLIC_FLAG_LIKE_BUTTON
   },
 
