@@ -21,10 +21,10 @@ type ImageCarouselProps = {
 const ROTATION = 42
 const DEPTH = 180
 const SPREAD = 52
-const SCROLL_STEP = 140
+const SCROLL_STEP = 320
 
 const ImageCarousel = (props: ImageCarouselProps) => {
-  const { images, interval = 4200 } = props
+  const { images, interval = 6500 } = props
   const count = images.length
   const [active, setActive] = useState(0)
   const [paused, setPaused] = useState(false)
@@ -88,12 +88,12 @@ const ImageCarousel = (props: ImageCarouselProps) => {
 
       while (scrollAccRef.current >= SCROLL_STEP) {
         scrollAccRef.current -= SCROLL_STEP
-        scrollPauseUntilRef.current = performance.now() + 1800
+        scrollPauseUntilRef.current = performance.now() + 3000
         go(activeRef.current + 1)
       }
       while (scrollAccRef.current <= -SCROLL_STEP) {
         scrollAccRef.current += SCROLL_STEP
-        scrollPauseUntilRef.current = performance.now() + 1800
+        scrollPauseUntilRef.current = performance.now() + 3000
         go(activeRef.current - 1)
       }
     }
@@ -178,7 +178,7 @@ const ImageCarousel = (props: ImageCarouselProps) => {
                     filter: isActive ? 'brightness(1)' : 'brightness(0.72)',
                     zIndex: 20 - abs
                   }}
-                  transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+                  transition={{ type: 'spring', stiffness: 60, damping: 20, mass: 1.2 }}
                   onClick={() => {
                     if (!isActive) {
                       go(index)
