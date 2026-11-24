@@ -6,9 +6,7 @@ import { flags } from '@simbashrd/env'
 import { setRequestLocale } from '@simbashrd/i18n/server'
 import { allPosts } from 'content-collections'
 import { notFound } from 'next/navigation'
-import { Suspense } from 'react'
 
-import Comments from '@/components/comments'
 import Mdx from '@/components/mdx'
 import MobileTableOfContents from '@/components/mobile-table-of-contents'
 import TableOfContents from '@/components/table-of-contents'
@@ -159,12 +157,6 @@ const Page = async (props: PageProps) => {
         {toc.length > 0 ? <MobileTableOfContents toc={toc} /> : null}
         <Footer />
       </Providers>
-
-      {flags.comment ? (
-        <Suspense>
-          <Comments slug={slug} />
-        </Suspense>
-      ) : null}
     </>
   )
 }

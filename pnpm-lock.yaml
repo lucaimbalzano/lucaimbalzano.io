@@ -274,6 +274,9 @@ importers:
       '@vercel/speed-insights':
         specifier: ^1.1.0
         version: 1.3.1(next@16.3.5(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@22.20.3)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+      ascii.rest:
+        specifier: 0.4.0
+        version: 0.4.0(react@19.0.0)
       canvas-confetti:
         specifier: ^1.9.3
         version: 1.9.4
@@ -5925,6 +5928,15 @@ packages:
 
   asap@2.0.6:
     resolution: {integrity: sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA==}
+
+  ascii.rest@0.4.0:
+    resolution: {integrity: sha512-lqKcesbm3Ij5ENvgs/CTRWF3HrjAogOoMJdqOh8rlRmdzG3uRSyqS/3chfnjJfcIeqj69MWI8+NstMZ/Br9Ivw==}
+    hasBin: true
+    peerDependencies:
+      react: '>=18'
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   assertion-error@2.0.1:
     resolution: {integrity: sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA==}
@@ -16218,6 +16230,10 @@ snapshots:
       is-array-buffer: 3.0.5
 
   asap@2.0.6: {}
+
+  ascii.rest@0.4.0(react@19.0.0):
+    optionalDependencies:
+      react: 19.0.0
 
   assertion-error@2.0.1: {}
 

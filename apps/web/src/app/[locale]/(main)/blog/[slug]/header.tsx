@@ -25,10 +25,6 @@ const Header = () => {
     slug
   })
 
-  const commentsCountQuery = api.comments.getTotalCommentsCount.useQuery({
-    slug
-  })
-
   const incremented = useRef(false)
 
   useEffect(() => {
@@ -44,7 +40,7 @@ const Header = () => {
         <h1 className='bg-linear-to-b from-black via-black/90 to-black/70 to-90% bg-clip-text text-center text-4xl font-bold text-transparent md:text-5xl md:leading-[64px] dark:from-white dark:via-white/90 dark:to-white/70'>
           {title}
         </h1>
-        <div className='grid grid-cols-2 text-sm max-md:gap-4 md:grid-cols-4'>
+        <div className='grid grid-cols-2 text-sm max-md:gap-4 md:grid-cols-3'>
           <div className='space-y-1 md:mx-auto'>
             <div className='text-muted-foreground'>{t('blog.header.written-by')}</div>
             <Link href='https://github.com/lucaimbalzano' className='flex items-center gap-2'>
@@ -68,14 +64,6 @@ const Header = () => {
             {viewsCountQuery.status === 'error' ? t('common.error') : null}
             {viewsCountQuery.status === 'success' ? (
               <NumberFlow willChange continuous value={viewsCountQuery.data.views} />
-            ) : null}
-          </div>
-          <div className='space-y-1 md:mx-auto'>
-            <div className='text-muted-foreground'>{t('blog.header.comments')}</div>
-            {commentsCountQuery.status === 'pending' ? '--' : null}
-            {commentsCountQuery.status === 'error' ? t('common.error') : null}
-            {commentsCountQuery.status === 'success' ? (
-              <NumberFlow willChange continuous value={commentsCountQuery.data.comments} />
             ) : null}
           </div>
         </div>

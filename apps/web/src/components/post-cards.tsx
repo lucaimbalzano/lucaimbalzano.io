@@ -37,10 +37,6 @@ const PostCard = (props: PostCardProps) => {
     slug
   })
 
-  const likesQuery = api.likes.get.useQuery({
-    slug
-  })
-
   return (
     <Link href={`/blog/${slug}`} className='shadow-feature-card group rounded-xl px-2 py-4'>
       <BlurImage
@@ -54,12 +50,6 @@ const PostCard = (props: PostCardProps) => {
       <div className='flex items-center justify-between gap-2 px-2 pt-4 text-sm text-zinc-500'>
         {formattedDate}
         <div className='flex gap-2'>
-          {likesQuery.status === 'pending' ? '--' : null}
-          {likesQuery.status === 'error' ? t('common.error') : null}
-          {likesQuery.status === 'success' ? (
-            <div>{t('common.likes', { count: likesQuery.data.likes })}</div>
-          ) : null}
-          <div>&middot;</div>
           {viewsQuery.status === 'pending' ? '--' : null}
           {viewsQuery.status === 'error' ? t('common.error') : null}
           {viewsQuery.status === 'success' ? (
